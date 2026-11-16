@@ -1,0 +1,13 @@
+# OS & Editor artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# Temporary staging & backup files
+itu-portfolio-stage-*/
+*.tmp
+*.bak
+*.log
