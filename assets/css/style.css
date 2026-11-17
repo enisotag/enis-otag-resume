@@ -248,6 +248,45 @@ html[lang="en"] [data-lang-block="tr"] {
   word-break: break-word;
 }
 
+.meta-email-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.copy-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color var(--transition), color var(--transition), background-color var(--transition), transform var(--transition);
+}
+
+.copy-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.copy-chip:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.copy-email-btn.is-copied {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: var(--bg-subtle);
+}
+
 .stack-sm {
   display: flex;
   flex-direction: column;
@@ -1439,6 +1478,12 @@ a.card:hover,
   margin-top: 14px;
 }
 
+.journey-stage .game-btn.copy-email-btn.is-copied {
+  border-color: #9EC1A3;
+  color: #9EC1A3;
+  background-color: rgba(158, 193, 163, 0.14);
+}
+
 .milestone-badges {
   display: flex;
   flex-wrap: wrap;
@@ -1718,6 +1763,7 @@ html.reveal-ready .card-interactive.reveal-item.is-visible:hover {
   .filter-bar,
   .btn,
   .control-btn,
+  .copy-email-btn,
   .mobile-nav-toggle,
   .hero-actions,
   .journey-toolbar,

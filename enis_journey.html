@@ -129,7 +129,7 @@
             </div>
             <div class="mt-6 md:mt-0 text-gray-400 space-y-1 text-sm">
                 <p>📍 İstanbul, Türkiye</p>
-                <p>✉️ enisotag56@gmail.com</p>
+                <p class="flex items-center gap-2">✉️ <a href="mailto:enisotag56@gmail.com" class="hover:text-white transition-colors">enisotag56@gmail.com</a> <button type="button" class="copy-email-btn text-xs px-2 py-0.5 rounded border border-gray-700 hover:border-cyan-400 text-gray-300" data-copy-email="enisotag56@gmail.com">Kopyala</button></p>
                 <p>💻 <a href="https://github.com/enisotag" target="_blank" rel="noopener" class="hover:text-white transition-colors">github.com/enisotag</a></p>
             </div>
         </header>
@@ -311,6 +311,10 @@
                         Schedule a Meeting ☕
                     </a>
 
+                    <button type="button" class="copy-email-btn mt-3 w-full py-2.5 px-4 rounded font-sans font-semibold text-sm border border-gray-700 bg-gray-900/90 text-gray-200 hover:border-cyan-400 relative z-10 transition-all" data-copy-email="enisotag56@gmail.com">
+                        📋 E-postayı Kopyala (enisotag56@gmail.com)
+                    </button>
+
                     <button id="endless-mode-btn" class="mt-4 w-full py-3 px-4 rounded font-sans font-bold text-sm relative z-10" style="background:linear-gradient(90deg,#ff00de,#00f3ff); color:#000;">
                         🎮 SONSUZ MODDA DEVAM ET (Yüksek Skor)
                     </button>
@@ -480,27 +484,27 @@
                 start: 'OYUNA BAŞLA', unlocked: '🔓 AÇIK', locked: '🔒 KİLİTLİ', completed: '🔓 TAMAMLANDI',
                 gameover: 'Kariyer yolculuğunda ufak bir tökezleme! Ama pes etmek yok, kodlamaya ve gelişmeye devam!', restart: 'YENİDEN OYNA 🔄',
                 hire: 'Tebrikler! Lise, İTÜ ve Intertech Stajı simülasyonunu başarıyla tamamladın. Hikayenin bir sonraki bölümünü yazmak için benimle iletişime geç!',
-                schedule: 'Toplantı Planla ☕', endless: '🎮 SONSUZ MODDA DEVAM ET (Yüksek Skor)', dir: 'ltr' },
+                schedule: 'Toplantı Planla ☕', copyEmail: '📋 E-postayı Kopyala', copied: 'Kopyalandı ✓', endless: '🎮 SONSUZ MODDA DEVAM ET (Yüksek Skor)', dir: 'ltr' },
             en: { instructions: 'The character runs automatically.<br><br>Press [SPACE] / [↑] to Jump &amp; Double Jump<br>or tap the screen.<br><br>Dodge obstacles, collect power-ups!<br><span class="text-cyan-300">[← / →]</span> tap speed · <span class="text-cyan-300">[P]</span> pause.',
                 start: 'START GAME', unlocked: '🔓 UNLOCKED', locked: '🔒 LOCKED', completed: '🔓 COMPLETED',
                 gameover: 'A small stumble on the career journey! But never give up — keep coding and growing!', restart: 'PLAY AGAIN 🔄',
                 hire: 'Congrats! You completed the High School, İTÜ and Intertech Internship simulation. Get in touch with me to write the next chapter of the story!',
-                schedule: 'Schedule a Meeting ☕', endless: '🎮 CONTINUE IN ENDLESS MODE (High Score)', dir: 'ltr' },
+                schedule: 'Schedule a Meeting ☕', copyEmail: '📋 Copy Email', copied: 'Copied ✓', endless: '🎮 CONTINUE IN ENDLESS MODE (High Score)', dir: 'ltr' },
             ar: { instructions: 'الشخصية تجري تلقائيًا.<br><br>اضغط [مسافة] / [↑] للقفز والقفز المزدوج<br>أو المس الشاشة.<br><br>تجنب العقبات واجمع التعزيزات!<br><span class="text-cyan-300">[← / →]</span> السرعة بضغطة · <span class="text-cyan-300">[P]</span> إيقاف مؤقت.',
                 start: 'ابدأ اللعبة', unlocked: '🔓 مفتوح', locked: '🔒 مقفل', completed: '🔓 مكتمل',
                 gameover: 'عثرة صغيرة في رحلة مسيرتك المهنية! لكن لا تستسلم، استمر بالبرمجة والتطور!', restart: 'إعادة اللعب 🔄',
                 hire: 'تهانينا! أكملت محاكاة الثانوية وجامعة İTÜ وتدريب Intertech. تواصل معي لكتابة الفصل التالي من القصة!',
-                schedule: 'حدد موعد اجتماع ☕', endless: '🎮 تابع في الوضع اللانهائي (أعلى نتيجة)', dir: 'rtl' },
+                schedule: 'حدد موعد اجتماع ☕', copyEmail: '📋 نسخ البريد الإلكتروني', copied: 'تم النسخ ✓', endless: '🎮 تابع في الوضع اللانهائي (أعلى نتيجة)', dir: 'rtl' },
             es: { instructions: 'El personaje corre automáticamente.<br><br>Presiona [ESPACIO] / [↑] para Saltar y Doble Salto<br>o toca la pantalla.<br><br>¡Esquiva obstáculos y recoge potenciadores!<br><span class="text-cyan-300">[← / →]</span> velocidad (1 toque) · <span class="text-cyan-300">[P]</span> pausa.',
                 start: 'EMPEZAR JUEGO', unlocked: '🔓 DESBLOQUEADO', locked: '🔒 BLOQUEADO', completed: '🔓 COMPLETADO',
                 gameover: '¡Un pequeño tropiezo en tu trayectoria profesional! Pero no te rindas, ¡sigue programando y creciendo!', restart: 'JUGAR DE NUEVO 🔄',
                 hire: '¡Felicidades! Completaste la simulación de Secundaria, İTÜ y Prácticas en Intertech. ¡Contáctame para escribir el siguiente capítulo de la historia!',
-                schedule: 'Agendar una Reunión ☕', endless: '🎮 CONTINUAR EN MODO INFINITO (Mejor Puntaje)', dir: 'ltr' },
+                schedule: 'Agendar una Reunión ☕', copyEmail: '📋 Copiar Correo', copied: 'Copiado ✓', endless: '🎮 CONTINUAR EN MODO INFINITO (Mejor Puntaje)', dir: 'ltr' },
             ja: { instructions: 'キャラクターは自動的に走ります。<br><br>[スペース] / [↑] でジャンプ＆二段ジャンプ<br>または画面をタップ。<br><br>障害物を避けてパワーアップを集めよう！<br><span class="text-cyan-300">[← / →]</span> 単押し速度 · <span class="text-cyan-300">[P]</span> 一時停止。',
                 start: 'ゲームスタート', unlocked: '🔓 解放済み', locked: '🔒 ロック中', completed: '🔓 完了',
                 gameover: 'キャリアの旅でちょっとしたつまずき！でも諦めずにコーディングと成長を続けよう！', restart: 'もう一度プレイ 🔄',
                 hire: 'おめでとうございます！高校、İTÜ、Intertechインターンシップのシミュレーションを完了しました。物語の次の章を一緒に書くために連絡してください！',
-                schedule: 'ミーティングを予約 ☕', endless: '🎮 エンドレスモードを続ける（ハイスコア）', dir: 'ltr' }
+                schedule: 'ミーティングを予約 ☕', copyEmail: '📋 メールをコピー', copied: 'コピー完了 ✓', endless: '🎮 エンドレスモードを続ける（ハイスコア）', dir: 'ltr' }
         };
         let currentLang = 'tr';
 
@@ -516,6 +520,9 @@
             const hi = document.getElementById('txt-hire'); if (hi) hi.textContent = t.hire;
             const sc = document.getElementById('txt-schedule'); if (sc) sc.innerHTML = t.schedule;
             const em = document.getElementById('endless-mode-btn'); if (em) em.textContent = t.endless;
+            document.querySelectorAll('.copy-email-btn').forEach(btn => {
+                btn.textContent = btn.dataset.copied === 'true' ? t.copied : t.copyEmail;
+            });
             document.querySelectorAll('.lang-btn').forEach(b => b.style.outline = b.dataset.lang === lang ? '2px solid #39ff14' : 'none');
             const card1 = document.getElementById('card-label-1'); if (card1) card1.textContent = lang === 'en' ? 'HIGH SCHOOL' : 'FEN LİSESİ';
             const card3 = document.getElementById('card-label-3'); if (card3) card3.textContent = lang === 'en' ? 'INTERTECH INTERNSHIP' : 'INTERTECH STAJI';
@@ -1506,6 +1513,49 @@
             }
         }
         window.addEventListener('resize', resizeCanvas);
+
+        function copyEmailWithFallback(text) {
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                return navigator.clipboard.writeText(text).catch(() => copyEmailFallback(text));
+            }
+            return copyEmailFallback(text);
+        }
+
+        function copyEmailFallback(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.top = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            let ok = false;
+            try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
+            document.body.removeChild(ta);
+            return ok ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+        }
+
+        document.querySelectorAll('.copy-email-btn[data-copy-email]').forEach(btn => {
+            let timer = 0;
+            btn.addEventListener('click', () => {
+                const email = btn.getAttribute('data-copy-email') || '';
+                if (!email) return;
+                copyEmailWithFallback(email).then(() => {
+                    if (timer) clearTimeout(timer);
+                    btn.dataset.copied = 'true';
+                    btn.textContent = (I18N[currentLang] && I18N[currentLang].copied) || 'Kopyalandı ✓';
+                    btn.style.borderColor = '#39ff14';
+                    btn.style.color = '#39ff14';
+                    timer = setTimeout(() => {
+                        delete btn.dataset.copied;
+                        btn.textContent = (I18N[currentLang] && I18N[currentLang].copyEmail) || '📋 E-postayı Kopyala';
+                        btn.style.borderColor = '';
+                        btn.style.color = '';
+                        timer = 0;
+                    }, 2200);
+                }).catch(() => {});
+            });
+        });
 
         window.onload = () => {
             resizeCanvas();

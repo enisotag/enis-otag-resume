@@ -67,13 +67,24 @@
     btn.setAttribute('title', ariaText);
   }
 
+  function getCopyButtonLabel(btn, lang) {
+    if (btn.getAttribute('data-copied') === 'true') {
+      return lang === 'en'
+        ? (btn.getAttribute('data-copied-en') || 'Copied ✓')
+        : (btn.getAttribute('data-copied-tr') || 'Kopyalandı ✓');
+    }
+    return lang === 'en' ? btn.getAttribute('data-en') : btn.getAttribute('data-tr');
+  }
+
   function applyTranslations(lang) {
     var i18nNodes = document.querySelectorAll('[data-tr][data-en]');
     for (var i = 0; i < i18nNodes.length; i++) {
       var el = i18nNodes[i];
       if (el.id === 'lang-toggle' || el.id === 'theme-toggle') continue;
 
-      var translated = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-tr');
+      var translated = el.classList.contains('copy-email-btn')
+        ? getCopyButtonLabel(el, lang)
+        : (lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-tr'));
       if (translated === null) continue;
 
       if (el.getAttribute('data-i18n-html') === 'true') {
@@ -568,11 +579,96 @@
     }
   }
 
+  function copyTextFallback(text) {
+    if (!document.body || typeof document.createElement !== 'function') {
+      return Promise.reject(new Error('Clipboard unavailable'));
+    }
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-9999px';
+    textarea.style.left = '-9999px';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0, text.length);
+
+    var ok = false;
+    try {
+      ok = typeof document.execCommand === 'function' && document.execCommand('copy');
+    } catch (e) {
+      ok = false;
+    }
+    document.body.removeChild(textarea);
+    return ok ? Promise.resolve() : Promise.reject(new Error('Copy command failed'));
+  }
+
+  function copyTextToClipboard(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () {
+        return copyTextFallback(text);
+      });
+    }
+    return copyTextFallback(text);
+  }
+
+  function initCopyEmailButtons() {
+    var copyButtons = document.querySelectorAll('.copy-email-btn[data-copy-email]');
+    if (!copyButtons.length) return;
+
+    var liveRegion = null;
+    if (document.body && typeof document.createElement === 'function') {
+      liveRegion = document.createElement('span');
+      liveRegion.className = 'sr-only';
+      liveRegion.setAttribute('aria-live', 'polite');
+      liveRegion.setAttribute('aria-atomic', 'true');
+      document.body.appendChild(liveRegion);
+    }
+
+    for (var i = 0; i < copyButtons.length; i++) {
+      (function (btn) {
+        var resetTimer = 0;
+
+        btn.addEventListener('click', function () {
+          var email = btn.getAttribute('data-copy-email') || '';
+          if (!email) return;
+
+          copyTextToClipboard(email).then(function () {
+            if (resetTimer) {
+              window.clearTimeout(resetTimer);
+            }
+            btn.setAttribute('data-copied', 'true');
+            btn.classList.add('is-copied');
+            btn.textContent = getCopyButtonLabel(btn, currentLang);
+
+            if (liveRegion) {
+              liveRegion.textContent = currentLang === 'en'
+                ? email + ' copied to clipboard'
+                : email + ' panoya kopyalandı';
+            }
+
+            resetTimer = window.setTimeout(function () {
+              btn.removeAttribute('data-copied');
+              btn.classList.remove('is-copied');
+              btn.textContent = getCopyButtonLabel(btn, currentLang);
+              resetTimer = 0;
+            }, 2200);
+          }).catch(function () {
+            // Do not silently claim copied if both Clipboard API and fallback fail
+          });
+        });
+      })(copyButtons[i]);
+    }
+  }
+
   function init() {
     setTheme(currentTheme, false);
     setLang(currentLang, false, false);
     highlightActiveNav();
     initControls();
+    initCopyEmailButtons();
     initMobileNav();
     initProjectFilters();
     initScrollReveal();
