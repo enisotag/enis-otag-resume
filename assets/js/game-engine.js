@@ -30,6 +30,7 @@
         const fullscreenBtn = document.getElementById('fullscreen-game-btn');
         const uiHp = document.getElementById('ui-hp');
         const uiScore = document.getElementById('ui-score');
+        const uiSpeed = document.getElementById('ui-speed');
         const uiLevel = document.getElementById('ui-level');
         const uiLevelName = document.getElementById('ui-level-name');
         const uiProgressFill = document.getElementById('ui-progress-fill');
@@ -68,7 +69,7 @@
     TECH_LOGOS.book = ASSET_BOOK;
         let gameState = 'START';
         let gameDistance = 0;
-        let gameSpeed = 2.6;
+        let gameSpeed = 3.0;
         let currentLevel = 1;
         let completedLevels = 0;
         let checkpointDistance = 0;
@@ -78,12 +79,13 @@
         let floatingTexts = [];
         let lastFrameTime = 0;
         let lastHudKey = '';
-        const lastHudState = { hp: '', score: '', level: '', levelName: '', pct: '', ariaPct: '', lockKey: '' };
+        const lastHudState = { hp: '', score: '', speed: '', level: '', levelName: '', pct: '', ariaPct: '', lockKey: '' };
 
         function invalidateHudCache() {
             lastHudKey = '';
             lastHudState.hp = '';
             lastHudState.score = '';
+            lastHudState.speed = '';
             lastHudState.level = '';
             lastHudState.levelName = '';
             lastHudState.pct = '';
@@ -95,7 +97,9 @@
         let playerScore = 0;
         let invincibilityTimer = 0;
         let speedBoostTimer = 0;
-        let speedHold = 1; // < / > tuşlarıyla oyuncunun kendi ayarladığı hız çarpanı
+        const SPEED_STEPS = [0.75, 1.0, 1.25, 1.45];
+        let speedStepIndex = 1;
+        let speedHold = SPEED_STEPS[speedStepIndex]; // ← / → (< / >) tek basış hız kademesi
         let endlessMode = false;
         let bestScore = parseInt(localStorage.getItem('career_best_score') || '0', 10);
 
@@ -170,35 +174,35 @@
 
         const I18N = {
             tr: {
-                instructions: 'Karakter otomatik koşar.<br><br>Zıplamak ve Çift Zıplamak için [BOŞLUK] / [↑]<br>tuşuna bas veya ekrana dokun.<br><br>Engelleri aş, güçlendirmeleri topla!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> hız · <span style="color:#9EC1A3;">[P]</span> duraklat.',
+                instructions: 'Karakter otomatik koşar.<br><br>Zıplamak ve Çift Zıplamak için [BOŞLUK] / [↑]<br>tuşuna bas veya ekrana dokun.<br><br>Engelleri aş, güçlendirmeleri topla!<br><span style="color:#9EC1A3;">[← / →]</span> tek basışla hız · <span style="color:#9EC1A3;">[P]</span> duraklat.',
                 start: 'OYUNA BAŞLA', unlocked: '🔓 AÇIK', locked: '🔒 KİLİTLİ', completed: '🔓 TAMAMLANDI',
                 gameover: 'Kariyer yolculuğunda ufak bir tökezleme! Ama pes etmek yok, kodlamaya ve gelişmeye devam!', restart: 'YENİDEN OYNA 🔄',
                 hire: 'Tebrikler! Lise, İTÜ ve Intertech Stajı simülasyonunu başarıyla tamamladın. Hikayenin bir sonraki bölümünü yazmak için benimle iletişime geç!',
                 schedule: 'Toplantı Planla ☕', endless: '🎮 SONSUZ MODDA DEVAM ET (Yüksek Skor)', dir: 'ltr'
             },
             en: {
-                instructions: 'The character runs automatically.<br><br>Press [SPACE] / [↑] to Jump &amp; Double Jump<br>or tap the screen.<br><br>Dodge obstacles, collect power-ups!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> speed · <span style="color:#9EC1A3;">[P]</span> pause.',
+                instructions: 'The character runs automatically.<br><br>Press [SPACE] / [↑] to Jump &amp; Double Jump<br>or tap the screen.<br><br>Dodge obstacles, collect power-ups!<br><span style="color:#9EC1A3;">[← / →]</span> tap speed · <span style="color:#9EC1A3;">[P]</span> pause.',
                 start: 'START GAME', unlocked: '🔓 UNLOCKED', locked: '🔒 LOCKED', completed: '🔓 COMPLETED',
                 gameover: 'A small stumble on the career journey! But never give up — keep coding and growing!', restart: 'PLAY AGAIN 🔄',
                 hire: 'Congrats! You completed the High School, İTÜ and Intertech Internship simulation. Get in touch with me to write the next chapter of the story!',
                 schedule: 'Schedule a Meeting ☕', endless: '🎮 CONTINUE IN ENDLESS MODE (High Score)', dir: 'ltr'
             },
             ar: {
-                instructions: 'الشخصية تجري تلقائيًا.<br><br>اضغط [مسافة] / [↑] للقفز والقفز المزدوج<br>أو المس الشاشة.<br><br>تجنب العقبات واجمع التعزيزات!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> السرعة · <span style="color:#9EC1A3;">[P]</span> إيقاف مؤقت.',
+                instructions: 'الشخصية تجري تلقائيًا.<br><br>اضغط [مسافة] / [↑] للقفز والقفز المزدوج<br>أو المس الشاشة.<br><br>تجنب العقبات واجمع التعزيزات!<br><span style="color:#9EC1A3;">[← / →]</span> السرعة بضغطة · <span style="color:#9EC1A3;">[P]</span> إيقاف مؤقت.',
                 start: 'ابدأ اللعبة', unlocked: '🔓 مفتوح', locked: '🔒 مقفل', completed: '🔓 مكتمل',
                 gameover: 'عثرة صغيرة في رحلة مسيرتك المهنية! لكن لا تستسلم، استمر بالبرمجة والتطور!', restart: 'إعادة اللعب 🔄',
                 hire: 'تهانينا! أكملت محاكاة الثانوية وجامعة İTÜ وتدريب Intertech. تواصل معي لكتابة الفصل التالي من القصة!',
                 schedule: 'حدد موعد اجتماع ☕', endless: '🎮 تابع في الوضع اللانهائي (أعلى نتيجة)', dir: 'rtl'
             },
             es: {
-                instructions: 'El personaje corre automáticamente.<br><br>Presiona [ESPACIO] / [↑] para Saltar y Doble Salto<br>o toca la pantalla.<br><br>¡Esquiva obstáculos y recoge potenciadores!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> velocidad · <span style="color:#9EC1A3;">[P]</span> pausa.',
+                instructions: 'El personaje corre automáticamente.<br><br>Presiona [ESPACIO] / [↑] para Saltar y Doble Salto<br>o toca la pantalla.<br><br>¡Esquiva obstáculos y recoge potenciadores!<br><span style="color:#9EC1A3;">[← / →]</span> velocidad (1 toque) · <span style="color:#9EC1A3;">[P]</span> pausa.',
                 start: 'EMPEZAR JUEGO', unlocked: '🔓 DESBLOQUEADO', locked: '🔒 BLOQUEADO', completed: '🔓 COMPLETADO',
                 gameover: '¡Un pequeño tropiezo en tu trayectoria profesional! Pero no te rindas, ¡sigue programando y creciendo!', restart: 'JUGAR DE NUEVO 🔄',
                 hire: '¡Felicidades! Completaste la simulación de Secundaria, İTÜ y Prácticas en Intertech. ¡Contáctame para escribir el siguiente capítulo de la historia!',
                 schedule: 'Agendar una Reunión ☕', endless: '🎮 CONTINUAR EN MODO INFINITO (Mejor Puntaje)', dir: 'ltr'
             },
             ja: {
-                instructions: 'キャラクターは自動的に走ります。<br><br>[スペース] / [↑] でジャンプ＆二段ジャンプ<br>または画面をタップ。<br><br>障害物を避けてパワーアップを集めよう！<br><span style="color:#9EC1A3;">&lt; / &gt;</span> 速度 · <span style="color:#9EC1A3;">[P]</span> 一時停止。',
+                instructions: 'キャラクターは自動的に走ります。<br><br>[スペース] / [↑] でジャンプ＆二段ジャンプ<br>または画面をタップ。<br><br>障害物を避けてパワーアップを集めよう！<br><span style="color:#9EC1A3;">[← / →]</span> 単押し速度 · <span style="color:#9EC1A3;">[P]</span> 一時停止。',
                 start: 'ゲームスタート', unlocked: '🔓 解放済み', locked: '🔒 ロック中', completed: '🔓 完了',
                 gameover: 'キャリアの旅でちょっとしたつまずき！でも諦めずにコーディングと成長を続けよう！', restart: 'もう一度プレイ 🔄',
                 hire: 'おめでとうございます！高校、İTÜ、Intertechインターンシップのシミュレーションを完了しました。物語の次の章を一緒に書くために連絡してください！',
@@ -343,7 +347,8 @@
             const clampedPct = Math.max(0, Math.min(100, pct));
             const pctStr = clampedPct.toFixed(1);
 
-            const hudKey = `${hpVal}|${scoreStr}|${currentLevel}|${levelNameStr}|${pctStr}|${completedLevels}|${currentLang}`;
+            const speedStr = `${speedHold}x`;
+            const hudKey = `${hpVal}|${scoreStr}|${speedStr}|${currentLevel}|${levelNameStr}|${pctStr}|${completedLevels}|${currentLang}`;
             if (hudKey === lastHudKey) return;
             lastHudKey = hudKey;
 
@@ -355,6 +360,10 @@
             if (uiScore && lastHudState.score !== scoreStr) {
                 lastHudState.score = scoreStr;
                 uiScore.innerText = scoreStr;
+            }
+            if (uiSpeed && lastHudState.speed !== speedStr) {
+                lastHudState.speed = speedStr;
+                uiSpeed.innerText = speedStr;
             }
             const levelStr = String(currentLevel);
             if (uiLevel && lastHudState.level !== levelStr) {
@@ -482,13 +491,14 @@
             player.jumpBufferTimer = 0;
             playerHp = 3;
             playerScore = 0;
-            gameSpeed = 2.6;
+            gameSpeed = 3.0;
             currentLevel = 1;
             completedLevels = 0;
             celebrationLevel = 0;
             invincibilityTimer = 0;
             speedBoostTimer = 0;
-            speedHold = 1;
+            speedStepIndex = 1;
+            speedHold = SPEED_STEPS[speedStepIndex];
             endlessMode = false;
             lastFrameTime = 0;
             invalidateHudCache();
@@ -933,7 +943,7 @@
                 }
             }
 
-            const speedMultiplier = Math.min(1.4, (speedBoostTimer > 0 ? 1.15 : 1) * speedHold);
+            const speedMultiplier = Math.min(1.55, (speedBoostTimer > 0 ? 1.15 : 1) * speedHold);
             gameDistance += gameSpeed * speedMultiplier * dt;
 
             // Boss Çarpışması & Anti-AFK Duvarı
@@ -1121,7 +1131,6 @@
         function togglePause() {
             if (gameState === 'PLAYING') {
                 gameState = 'PAUSED';
-                speedHold = 1;
                 lastFrameTime = 0;
             } else if (gameState === 'PAUSED') {
                 lastFrameTime = 0;
@@ -1131,6 +1140,17 @@
             }
             updatePauseUI();
             draw();
+        }
+
+        function stepSpeed(delta) {
+            if (gameState !== 'PLAYING') return;
+            const nextIndex = Math.max(0, Math.min(SPEED_STEPS.length - 1, speedStepIndex + delta));
+            if (nextIndex === speedStepIndex) return;
+            speedStepIndex = nextIndex;
+            speedHold = SPEED_STEPS[speedStepIndex];
+            const label = currentLang === 'en' ? 'SPEED' : 'HIZ';
+            spawnText(`${label} ${speedHold}x`, player.x, player.y - 24, '#9EC1A3');
+            updateHUD();
         }
 
         window.addEventListener('keydown', (e) => {
@@ -1156,25 +1176,18 @@
                 if (!e.repeat) jump();
             }
             if (e.code === 'ArrowRight' || e.key === '>' || e.key === '.') {
-                speedHold = 1.35;
-                e.preventDefault();
+                if (gameState === 'PLAYING' || gameState === 'PAUSED') e.preventDefault();
+                if (!e.repeat) stepSpeed(1);
             }
             if (e.code === 'ArrowLeft' || e.key === '<' || e.key === ',') {
-                speedHold = 0.65;
-                e.preventDefault();
-            }
-        });
-
-        window.addEventListener('keyup', (e) => {
-            if (e.code === 'ArrowRight' || e.code === 'ArrowLeft' || e.key === '>' || e.key === '<' || e.key === '.' || e.key === ',') {
-                speedHold = 1;
+                if (gameState === 'PLAYING' || gameState === 'PAUSED') e.preventDefault();
+                if (!e.repeat) stepSpeed(-1);
             }
         });
 
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 lastFrameTime = 0;
-                speedHold = 1;
             }
         });
 
@@ -1228,7 +1241,8 @@
                 endlessMode = false;
                 speedBoostTimer = 0;
                 invincibilityTimer = 0;
-                speedHold = 1;
+                speedStepIndex = 1;
+                speedHold = SPEED_STEPS[speedStepIndex];
                 lastFrameTime = 0;
                 canvas.style.filter = '';
                 canvasContainer.style.filter = '';
@@ -1278,7 +1292,6 @@
                 player.jumpsRemaining = 2;
                 player.coyoteTimer = 7;
                 player.jumpBufferTimer = 0;
-                speedHold = 1;
                 lastFrameTime = 0;
                 lastHudKey = '';
                 updateHUD();
