@@ -67,6 +67,22 @@ body {
   transition: background-color var(--transition), color var(--transition);
 }
 
+/* Subtle SVG archival paper grain overlay (imperceptible tactile surface) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+[data-theme="dark"] body::before {
+  opacity: 0.036;
+}
+
 @keyframes pageEnter {
   from {
     opacity: 0;
@@ -189,6 +205,90 @@ html[lang="en"] [data-lang-block="tr"] {
 
 .section-sm {
   padding: 40px 0;
+}
+
+section[id] {
+  scroll-margin-top: 88px;
+}
+
+/* Desktop right-margin architectural section index (about & projects) */
+.section-rail {
+  display: none;
+}
+
+@media (min-width: 1360px) {
+  .section-rail {
+    display: block;
+    position: fixed;
+    top: calc(var(--header-height) + 48px);
+    left: calc(50% + 530px);
+    width: 142px;
+    z-index: 40;
+  }
+}
+
+@media (min-width: 1460px) {
+  .section-rail {
+    left: calc(50% + 544px);
+    width: 156px;
+  }
+}
+
+.rail-heading {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+  padding-left: 12px;
+}
+
+.rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--border);
+}
+
+.rail-link {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 5px 0 5px 11px;
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+  transition: color var(--transition), border-color var(--transition), opacity var(--transition);
+}
+
+.rail-num {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  opacity: 0.72;
+  flex-shrink: 0;
+}
+
+.rail-link:hover {
+  color: var(--text);
+}
+
+.rail-link.is-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 500;
+}
+
+.rail-link.is-active .rail-num {
+  opacity: 1;
+}
+
+.rail-link.is-muted {
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 .grid-2 {
@@ -766,7 +866,7 @@ html[lang="en"] [data-lang-block="tr"] {
   align-items: baseline;
   padding: 24px 12px;
   border-bottom: 1px solid var(--border);
-  transition: background-color var(--transition), border-color var(--transition);
+  transition: background-color var(--transition), border-color var(--transition), opacity var(--transition);
 }
 
 .index-row:hover {
@@ -1755,6 +1855,20 @@ html.reveal-ready .card-interactive.reveal-item.is-visible:hover {
   transition-delay: 0ms;
 }
 
+@media (hover: hover) {
+  .index-list:hover .index-row:not(:hover),
+  html.reveal-ready .index-list:hover .index-row.is-visible:not(:hover) {
+    opacity: 0.72;
+    transition-delay: 0ms;
+  }
+}
+
+.index-list:has(.index-row:focus-visible) .index-row:not(:focus-visible),
+html.reveal-ready .index-list:has(.index-row:focus-visible) .index-row.is-visible:not(:focus-visible) {
+  opacity: 0.72;
+  transition-delay: 0ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -1808,8 +1922,10 @@ html.reveal-ready .card-interactive.reveal-item.is-visible:hover {
     transform: none !important;
   }
 
+  body::before,
   .site-header,
   .site-footer,
+  .section-rail,
   .cv-actions,
   .filter-bar,
   .btn,
