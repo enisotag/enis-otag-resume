@@ -69,7 +69,7 @@
     TECH_LOGOS.book = ASSET_BOOK;
         let gameState = 'START';
         let gameDistance = 0;
-        let gameSpeed = 3.0;
+        let gameSpeed = 3.8;
         let currentLevel = 1;
         let completedLevels = 0;
         let checkpointDistance = 0;
@@ -97,7 +97,7 @@
         let playerScore = 0;
         let invincibilityTimer = 0;
         let speedBoostTimer = 0;
-        const SPEED_STEPS = [0.75, 1.0, 1.25, 1.45];
+        const SPEED_STEPS = [0.75, 1.0, 1.25, 1.5];
         let speedStepIndex = 1;
         let speedHold = SPEED_STEPS[speedStepIndex]; // ← / → (< / >) tek basış hız kademesi
         let endlessMode = false;
@@ -491,7 +491,7 @@
             player.jumpBufferTimer = 0;
             playerHp = 3;
             playerScore = 0;
-            gameSpeed = 3.0;
+            gameSpeed = 3.8;
             currentLevel = 1;
             completedLevels = 0;
             celebrationLevel = 0;
@@ -943,7 +943,7 @@
                 }
             }
 
-            const speedMultiplier = Math.min(1.55, (speedBoostTimer > 0 ? 1.15 : 1) * speedHold);
+            const speedMultiplier = Math.min(1.6, (speedBoostTimer > 0 ? 1.15 : 1) * speedHold);
             gameDistance += gameSpeed * speedMultiplier * dt;
 
             // Boss Çarpışması & Anti-AFK Duvarı
