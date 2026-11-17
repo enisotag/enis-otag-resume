@@ -41,6 +41,7 @@
         <a href="journey.html" class="nav-link nav-link-journey" data-tr="Enis's Journey · Oyun" data-en="Enis's Journey · Game">Enis's Journey · Oyun</a>
       </nav>
       <div class="header-actions">
+        <button type="button" class="control-btn cmd-trigger" id="cmd-palette-trigger" aria-haspopup="dialog" aria-controls="cmd-palette" aria-expanded="false"><span class="cmd-trigger-label" data-tr="Ara" data-en="Search">Ara</span><kbd class="cmd-trigger-kbd">Ctrl+K</kbd></button>
         <button type="button" class="control-btn" id="lang-toggle" aria-label="Switch language to English">EN</button>
         <button type="button" class="control-btn" id="theme-toggle" aria-label="Koyu temaya geç" aria-pressed="false">KOYU</button>
         <button type="button" class="control-btn mobile-nav-toggle" id="mobile-nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menüyü aç / Toggle menu" data-tr="Menü" data-en="Menu">Menü</button>
@@ -120,6 +121,28 @@
 
             <div class="project-architecture">
               <p class="eyebrow" data-tr="MİMARİ BİLEŞENLER &amp; TEKNİK ÖZELLİKLER" data-en="ARCHITECTURAL SPECIFICATIONS">MİMARİ BİLEŞENLER &amp; TEKNİK ÖZELLİKLER</p>
+              <div class="arch-diagram-wrap">
+                <svg class="arch-diagram" viewBox="0 0 760 74" role="img" aria-label="Borsa Ajanı sistem akışı: Multi-Source Feeds, ThreadPool ve TTL Cache, Gemini veya Groq Llama 3.3 Yedekleme, Telegram ve SQLite/GitHub/Docker">
+                  <rect x="1" y="11" width="164" height="52" rx="2" class="arch-node-box"/>
+                  <text x="83" y="33" text-anchor="middle" class="arch-node-title">Multi-Source Feeds</text>
+                  <text x="83" y="49" text-anchor="middle" class="arch-node-sub">TradingView · Yahoo · RSS</text>
+                  <line x1="165" y1="37" x2="195" y2="37" class="arch-edge"/>
+                  <path d="M190 33 L195 37 L190 41" class="arch-edge"/>
+                  <rect x="196" y="11" width="164" height="52" rx="2" class="arch-node-box"/>
+                  <text x="278" y="33" text-anchor="middle" class="arch-node-title">ThreadPool + Cache</text>
+                  <text x="278" y="49" text-anchor="middle" class="arch-node-sub">Concurrent TTL Layer</text>
+                  <line x1="360" y1="37" x2="390" y2="37" class="arch-edge"/>
+                  <path d="M385 33 L390 37 L385 41" class="arch-edge"/>
+                  <rect x="391" y="11" width="174" height="52" rx="2" class="arch-node-accent"/>
+                  <text x="478" y="33" text-anchor="middle" class="arch-node-title">Gemini / Llama 3.3</text>
+                  <text x="478" y="49" text-anchor="middle" class="arch-node-sub">Auto Failover + Vision OCR</text>
+                  <line x1="565" y1="37" x2="595" y2="37" class="arch-edge"/>
+                  <path d="M590 33 L595 37 L590 41" class="arch-edge"/>
+                  <rect x="596" y="11" width="163" height="52" rx="2" class="arch-node-box"/>
+                  <text x="677.5" y="33" text-anchor="middle" class="arch-node-title">Telegram &amp; Persist</text>
+                  <text x="677.5" y="49" text-anchor="middle" class="arch-node-sub">SQLite · GitHub · Docker</text>
+                </svg>
+              </div>
               <ul class="spec-list">
                 <li>
                   <strong data-tr="Eş Zamanlı Veri Hattı" data-en="Concurrent Pipeline">Eş Zamanlı Veri Hattı</strong>
@@ -180,6 +203,28 @@
 
             <div class="project-architecture">
               <p class="eyebrow" data-tr="MİMARİ BİLEŞENLER &amp; TEKNİK ÖZELLİKLER" data-en="ARCHITECTURAL SPECIFICATIONS">MİMARİ BİLEŞENLER &amp; TEKNİK ÖZELLİKLER</p>
+              <div class="arch-diagram-wrap">
+                <svg class="arch-diagram" viewBox="0 0 760 74" role="img" aria-label="VIRA Finance Agent sistem akışı: Financial Query, Scope Guardrails, LangGraph AnalystAgent, RAG ve Live Tools">
+                  <rect x="1" y="11" width="164" height="52" rx="2" class="arch-node-box"/>
+                  <text x="83" y="33" text-anchor="middle" class="arch-node-title">Financial Query</text>
+                  <text x="83" y="49" text-anchor="middle" class="arch-node-sub">Banking Domain Input</text>
+                  <line x1="165" y1="37" x2="195" y2="37" class="arch-edge"/>
+                  <path d="M190 33 L195 37 L190 41" class="arch-edge"/>
+                  <rect x="196" y="11" width="164" height="52" rx="2" class="arch-node-box"/>
+                  <text x="278" y="33" text-anchor="middle" class="arch-node-title">Scope Guardrails</text>
+                  <text x="278" y="49" text-anchor="middle" class="arch-node-sub">Rule-Based Validation</text>
+                  <line x1="360" y1="37" x2="390" y2="37" class="arch-edge"/>
+                  <path d="M385 33 L390 37 L385 41" class="arch-edge"/>
+                  <rect x="391" y="11" width="174" height="52" rx="2" class="arch-node-accent"/>
+                  <text x="478" y="33" text-anchor="middle" class="arch-node-title">LangGraph Graph</text>
+                  <text x="478" y="49" text-anchor="middle" class="arch-node-sub">AnalystAgent Orchestrator</text>
+                  <line x1="565" y1="37" x2="595" y2="37" class="arch-edge"/>
+                  <path d="M590 33 L595 37 L590 41" class="arch-edge"/>
+                  <rect x="596" y="11" width="163" height="52" rx="2" class="arch-node-box"/>
+                  <text x="677.5" y="33" text-anchor="middle" class="arch-node-title">RAG &amp; Live Tools</text>
+                  <text x="677.5" y="49" text-anchor="middle" class="arch-node-sub">Vector + Trace Telemetry</text>
+                </svg>
+              </div>
               <ul class="spec-list">
                 <li>
                   <strong data-tr="Ajan Orkestrasyonu" data-en="Multi-Agent Graph">Ajan Orkestrasyonu</strong>
@@ -239,6 +284,28 @@
 
             <div class="project-architecture">
               <p class="eyebrow" data-tr="MİMARİ BİLEŞENLER &amp; TEKNİK ÖZELLİKLER" data-en="ARCHITECTURAL SPECIFICATIONS">MİMARİ BİLEŞENLER &amp; TEKNİK ÖZELLİKLER</p>
+              <div class="arch-diagram-wrap">
+                <svg class="arch-diagram" viewBox="0 0 760 74" role="img" aria-label="Winsock HTTP/1.1 Server sistem akışı: TCP Client localhost:8080, Winsock Bind/Accept, Raw Byte Parser, HTTP/1.1 200 OK">
+                  <rect x="1" y="11" width="164" height="52" rx="2" class="arch-node-box"/>
+                  <text x="83" y="33" text-anchor="middle" class="arch-node-title">TCP Client</text>
+                  <text x="83" y="49" text-anchor="middle" class="arch-node-sub">Stream → localhost:8080</text>
+                  <line x1="165" y1="37" x2="195" y2="37" class="arch-edge"/>
+                  <path d="M190 33 L195 37 L190 41" class="arch-edge"/>
+                  <rect x="196" y="11" width="164" height="52" rx="2" class="arch-node-box"/>
+                  <text x="278" y="33" text-anchor="middle" class="arch-node-title">Winsock API</text>
+                  <text x="278" y="49" text-anchor="middle" class="arch-node-sub">Bind · Listen · Accept</text>
+                  <line x1="360" y1="37" x2="390" y2="37" class="arch-edge"/>
+                  <path d="M385 33 L390 37 L385 41" class="arch-edge"/>
+                  <rect x="391" y="11" width="174" height="52" rx="2" class="arch-node-accent"/>
+                  <text x="478" y="33" text-anchor="middle" class="arch-node-title">Raw Byte Parser</text>
+                  <text x="478" y="49" text-anchor="middle" class="arch-node-sub">Socket Buffers → Request</text>
+                  <line x1="565" y1="37" x2="595" y2="37" class="arch-edge"/>
+                  <path d="M590 33 L595 37 L590 41" class="arch-edge"/>
+                  <rect x="596" y="11" width="163" height="52" rx="2" class="arch-node-box"/>
+                  <text x="677.5" y="33" text-anchor="middle" class="arch-node-title">HTTP/1.1 200 OK</text>
+                  <text x="677.5" y="49" text-anchor="middle" class="arch-node-sub">Framing &amp; Clean Close</text>
+                </svg>
+              </div>
               <ul class="spec-list">
                 <li>
                   <strong data-tr="Taşıma Katmanı" data-en="Transport Layer">Taşıma Katmanı</strong>
@@ -296,6 +363,28 @@
 
             <div class="project-architecture">
               <p class="eyebrow" data-tr="MİMARİ BİLEŞENLER &amp; TEKNİK ÖZELLİKLER" data-en="ARCHITECTURAL SPECIFICATIONS">MİMARİ BİLEŞENLER &amp; TEKNİK ÖZELLİKLER</p>
+              <div class="arch-diagram-wrap">
+                <svg class="arch-diagram" viewBox="0 0 760 74" role="img" aria-label="Native PHP ve MySQL CMS mimari akışı: SEO Frontend ve Admin, bcrypt Session Firewall, PDO Prepared Layer, MySQL 1:N ve N:M">
+                  <rect x="1" y="11" width="164" height="52" rx="2" class="arch-node-box"/>
+                  <text x="83" y="33" text-anchor="middle" class="arch-node-title">Client / Admin</text>
+                  <text x="83" y="49" text-anchor="middle" class="arch-node-sub">SEO Semantic Templates</text>
+                  <line x1="165" y1="37" x2="195" y2="37" class="arch-edge"/>
+                  <path d="M190 33 L195 37 L190 41" class="arch-edge"/>
+                  <rect x="196" y="11" width="164" height="52" rx="2" class="arch-node-box"/>
+                  <text x="278" y="33" text-anchor="middle" class="arch-node-title">Session Firewall</text>
+                  <text x="278" y="49" text-anchor="middle" class="arch-node-sub">bcrypt password_hash()</text>
+                  <line x1="360" y1="37" x2="390" y2="37" class="arch-edge"/>
+                  <path d="M385 33 L390 37 L385 41" class="arch-edge"/>
+                  <rect x="391" y="11" width="174" height="52" rx="2" class="arch-node-accent"/>
+                  <text x="478" y="33" text-anchor="middle" class="arch-node-title">PDO Data Layer</text>
+                  <text x="478" y="49" text-anchor="middle" class="arch-node-sub">Prepared SQLi Guard</text>
+                  <line x1="565" y1="37" x2="595" y2="37" class="arch-edge"/>
+                  <path d="M590 33 L595 37 L590 41" class="arch-edge"/>
+                  <rect x="596" y="11" width="163" height="52" rx="2" class="arch-node-box"/>
+                  <text x="677.5" y="33" text-anchor="middle" class="arch-node-title">MySQL Schema</text>
+                  <text x="677.5" y="49" text-anchor="middle" class="arch-node-sub">1:N &amp; N:M Tables</text>
+                </svg>
+              </div>
               <ul class="spec-list">
                 <li>
                   <strong data-tr="SQLi Koruması" data-en="SQLi Protection">SQLi Koruması</strong>
@@ -417,6 +506,7 @@
       <div class="footer-meta">
         <p>© 2026 Süleyman Enis Otağ · İstanbul, Türkiye <span class="footer-clock" data-istanbul-clock="inline"></span></p>
         <p data-tr="İstanbul Teknik Üniversitesi · Bilgisayar Mühendisliği Bölümü" data-en="Istanbul Technical University · Department of Computer Engineering">İstanbul Teknik Üniversitesi · Bilgisayar Mühendisliği Bölümü</p>
+        <p class="footer-shortcuts" data-tr="Kısayollar: Ctrl+K Palet · 1–4 Sayfalar · T Tema · L Dil" data-en="Shortcuts: Ctrl+K Palette · 1–4 Pages · T Theme · L Lang">Kısayollar: Ctrl+K Palet · 1–4 Sayfalar · T Tema · L Dil</p>
       </div>
       <div class="footer-links">
         <a href="mailto:enisotag56@gmail.com" data-tr="E-posta" data-en="Email">E-posta</a>

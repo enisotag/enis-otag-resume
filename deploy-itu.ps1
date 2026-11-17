@@ -10,7 +10,7 @@
 
     Note on ITU BİDB server configuration:
     İTÜ personal web pages use 'ssh.itu.edu.tr' (default SSH/SFTP gateway) or
-    'web.itu.edu.tr', mapping to 'public_html' inside your home directory.
+    'web.itu.edu.tr', serving your site from 'web.itu.edu.tr' inside your home directory.
     Off-campus connections require an active ITU VPN (FortiClient) session
     because İTÜ BİDB blocks port 22 from external networks.
 
@@ -22,7 +22,7 @@
     back to "web.itu.edu.tr" if needed).
 
 .PARAMETER RemotePath
-    Remote destination directory on the ITU server (default: "public_html").
+    Remote destination directory on the ITU server (default: "web.itu.edu.tr").
 
 .PARAMETER Port
     SSH/SCP port number (default: 22).
@@ -35,7 +35,7 @@
     .\deploy-itu.ps1 -DryRun
 
 .EXAMPLE
-    .\deploy-itu.ps1 -Username "otag23" -RemoteHost "ssh.itu.edu.tr" -RemotePath "public_html"
+    .\deploy-itu.ps1 -Username "otag23" -RemoteHost "ssh.itu.edu.tr" -RemotePath "web.itu.edu.tr"
 
 .EXAMPLE
     .\deploy-itu.ps1 -RemoteHost "web.itu.edu.tr"
@@ -45,7 +45,7 @@
 param(
     [string]$Username = "otag23",
     [string]$RemoteHost = "ssh.itu.edu.tr",
-    [string]$RemotePath = "public_html",
+    [string]$RemotePath = "web.itu.edu.tr",
     [int]$Port = 22,
     [switch]$DryRun
 )
@@ -55,7 +55,7 @@ $ErrorActionPreference = "Stop"
 
 $RemotePath = $RemotePath.Trim().TrimEnd('/')
 if ([string]::IsNullOrWhiteSpace($RemotePath)) {
-    $RemotePath = "public_html"
+    $RemotePath = "web.itu.edu.tr"
 }
 
 $ProjectRoot = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
@@ -65,7 +65,8 @@ $DeployFiles = @(
     "about.html",
     "projects.html",
     "journey.html",
-    "enis_journey.html"
+    "enis_journey.html",
+    "404.html"
 )
 $DeployDirectories = @(
     "assets"
@@ -134,7 +135,7 @@ function Show-FallbackInstructions {
     Write-Host "   - Port      : 22"
     Write-Host "   - User name : $User"
     Write-Host "   - Remote dir: ~/$TargetDir"
-    Write-Host "   - Upload ONLY: index.html, about.html, projects.html, journey.html, enis_journey.html, and assets/"
+    Write-Host "   - Upload ONLY: index.html, about.html, projects.html, journey.html, enis_journey.html, 404.html, and assets/"
     Write-Host "   - Exclude    : .git, .gitignore, README.md, deploy-itu.ps1"
     Write-Host ""
     Write-Host "4. Permissions Check (if https://web.itu.edu.tr/$User/ returns 403):"

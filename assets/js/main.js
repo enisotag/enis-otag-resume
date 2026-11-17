@@ -418,6 +418,77 @@
     }
   }
 
+  function resolveSameSiteHtmlUrl(rawHref) {
+    var trimmed = (rawHref || '').trim();
+    if (!trimmed || trimmed.charAt(0) === '#') return null;
+
+    var lowerHref = trimmed.toLowerCase();
+    if (
+      lowerHref.indexOf('mailto:') === 0 ||
+      lowerHref.indexOf('tel:') === 0 ||
+      lowerHref.indexOf('javascript:') === 0
+    ) {
+      return null;
+    }
+
+    var targetUrl;
+    try {
+      targetUrl = new URL(trimmed, window.location.href);
+    } catch (_) {
+      return null;
+    }
+
+    if (
+      targetUrl.protocol !== 'http:' &&
+      targetUrl.protocol !== 'https:' &&
+      targetUrl.protocol !== 'file:'
+    ) {
+      return null;
+    }
+
+    if (targetUrl.protocol !== window.location.protocol) return null;
+    if (
+      window.location.origin &&
+      window.location.origin !== 'null' &&
+      targetUrl.origin !== window.location.origin
+    ) {
+      return null;
+    }
+
+    if (!/\.html$/i.test(targetUrl.pathname)) return null;
+    return targetUrl;
+  }
+
+  function navigateToUrl(rawHref) {
+    var targetUrl = resolveSameSiteHtmlUrl(rawHref);
+    if (!targetUrl) {
+      window.location.href = rawHref;
+      return;
+    }
+
+    if (
+      targetUrl.pathname === window.location.pathname &&
+      targetUrl.search === window.location.search &&
+      targetUrl.hash
+    ) {
+      window.location.href = targetUrl.href;
+      return;
+    }
+
+    if (prefersReducedMotion() || !document.body) {
+      window.location.href = targetUrl.href;
+      return;
+    }
+
+    if (isNavigating) return;
+    isNavigating = true;
+    document.body.classList.add('is-leaving');
+
+    window.setTimeout(function () {
+      window.location.href = targetUrl.href;
+    }, 150);
+  }
+
   function initPageTransitions() {
     clearLeavingState();
     window.addEventListener('pageshow', clearLeavingState);
@@ -437,42 +508,8 @@
       if (link.hasAttribute('download')) return;
 
       var rawHref = (link.getAttribute('href') || '').trim();
-      if (!rawHref || rawHref.charAt(0) === '#') return;
-
-      var lowerHref = rawHref.toLowerCase();
-      if (
-        lowerHref.indexOf('mailto:') === 0 ||
-        lowerHref.indexOf('tel:') === 0 ||
-        lowerHref.indexOf('javascript:') === 0
-      ) {
-        return;
-      }
-
-      var targetUrl;
-      try {
-        targetUrl = new URL(rawHref, window.location.href);
-      } catch (_) {
-        return;
-      }
-
-      if (
-        targetUrl.protocol !== 'http:' &&
-        targetUrl.protocol !== 'https:' &&
-        targetUrl.protocol !== 'file:'
-      ) {
-        return;
-      }
-
-      if (targetUrl.protocol !== window.location.protocol) return;
-      if (
-        window.location.origin &&
-        window.location.origin !== 'null' &&
-        targetUrl.origin !== window.location.origin
-      ) {
-        return;
-      }
-
-      if (!/\.html$/i.test(targetUrl.pathname)) return;
+      var targetUrl = resolveSameSiteHtmlUrl(rawHref);
+      if (!targetUrl) return;
 
       if (
         targetUrl.pathname === window.location.pathname &&
@@ -483,16 +520,46 @@
       }
 
       if (!document.body) return;
-
       event.preventDefault();
-      if (isNavigating) return;
-      isNavigating = true;
-      document.body.classList.add('is-leaving');
-
-      window.setTimeout(function () {
-        window.location.href = targetUrl.href;
-      }, 150);
+      navigateToUrl(targetUrl.href);
     });
+  }
+
+  function initLinkPrefetch() {
+    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn && (conn.saveData || /2g/i.test(conn.effectiveType || ''))) {
+      return;
+    }
+    if (!document.head || typeof document.createElement !== 'function') return;
+
+    var prefetched = {};
+    function maybePrefetch(event) {
+      var target = event.target;
+      var link = target && target.closest ? target.closest('a[href]') : null;
+      if (!link) return;
+
+      var targetUrl = resolveSameSiteHtmlUrl(link.getAttribute('href'));
+      if (!targetUrl) return;
+      if (targetUrl.protocol !== 'http:' && targetUrl.protocol !== 'https:') return;
+
+      var cacheKey = targetUrl.origin + targetUrl.pathname + targetUrl.search;
+      if (
+        cacheKey === window.location.origin + window.location.pathname + window.location.search ||
+        prefetched[cacheKey]
+      ) {
+        return;
+      }
+      prefetched[cacheKey] = true;
+
+      var hint = document.createElement('link');
+      hint.rel = 'prefetch';
+      hint.as = 'document';
+      hint.href = cacheKey;
+      document.head.appendChild(hint);
+    }
+
+    document.addEventListener('pointerenter', maybePrefetch, true);
+    document.addEventListener('focusin', maybePrefetch);
   }
 
   function initProjectFilters() {
@@ -625,15 +692,6 @@
     var copyButtons = document.querySelectorAll('.copy-email-btn[data-copy-email]');
     if (!copyButtons.length) return;
 
-    var liveRegion = null;
-    if (document.body && typeof document.createElement === 'function') {
-      liveRegion = document.createElement('span');
-      liveRegion.className = 'sr-only';
-      liveRegion.setAttribute('aria-live', 'polite');
-      liveRegion.setAttribute('aria-atomic', 'true');
-      document.body.appendChild(liveRegion);
-    }
-
     for (var i = 0; i < copyButtons.length; i++) {
       (function (btn) {
         var resetTimer = 0;
@@ -650,11 +708,11 @@
             btn.classList.add('is-copied');
             btn.textContent = getCopyButtonLabel(btn, currentLang);
 
-            if (liveRegion) {
-              liveRegion.textContent = currentLang === 'en'
+            announceStatus(
+              currentLang === 'en'
                 ? email + ' copied to clipboard'
-                : email + ' panoya kopyalandı';
-            }
+                : email + ' panoya kopyalandı'
+            );
 
             resetTimer = window.setTimeout(function () {
               btn.removeAttribute('data-copied');
@@ -881,6 +939,524 @@
     document.addEventListener('portfolio:filterchange', syncSectionRail);
   }
 
+  function isApplePlatform() {
+    var ua = (navigator && (navigator.platform || navigator.userAgent)) || '';
+    return /Mac|iPhone|iPad|iPod/i.test(ua);
+  }
+
+  function isGamePlayingOnJourneyPage() {
+    if (extractPageFilename(window.location.pathname) !== 'journey.html') {
+      return false;
+    }
+    var fs = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fs) return true;
+
+    var startUi = document.getElementById('game-start-ui');
+    var overUi = document.getElementById('game-over-ui');
+    var celUi = document.getElementById('level-celebration-ui');
+    var hireUi = document.getElementById('hire-me-modal');
+    if (
+      startUi && overUi && celUi && hireUi &&
+      startUi.classList.contains('hidden') &&
+      overUi.classList.contains('hidden') &&
+      celUi.classList.contains('hidden') &&
+      hireUi.classList.contains('hidden')
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  function isTypingTarget(target) {
+    if (!target) return false;
+    var tag = (target.tagName || '').toUpperCase();
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    if (target.isContentEditable) return true;
+    return Boolean(target.closest && target.closest('[contenteditable="true"]'));
+  }
+
+  function initCommandPalette() {
+    var trigger = document.getElementById('cmd-palette-trigger');
+    var shortcutBadge = trigger ? trigger.querySelector('.cmd-trigger-kbd') : null;
+    if (shortcutBadge) {
+      shortcutBadge.textContent = isApplePlatform() ? '⌘K' : 'Ctrl+K';
+    }
+
+    var backdrop = null;
+    var inputEl = null;
+    var listEl = null;
+    var footerEl = null;
+    var isOpen = false;
+    var selectedIdx = 0;
+    var filteredItems = [];
+    var restoreFocusEl = null;
+
+    function getCommands() {
+      var isEn = currentLang === 'en';
+      var mod = isApplePlatform() ? '⌘K' : 'Ctrl+K';
+      return [
+        {
+          groupTr: 'Sayfalar',
+          groupEn: 'Pages',
+          titleTr: 'Ana Sayfa',
+          titleEn: 'Home',
+          subTr: 'Genel bakış, seçili çalışmalar ve iletişim',
+          subEn: 'Overview, selected works, and contact',
+          keywords: 'ana sayfa home index portfolyo portfolio 1',
+          kbd: '1',
+          run: function () { navigateToUrl('index.html'); }
+        },
+        {
+          groupTr: 'Sayfalar',
+          groupEn: 'Pages',
+          titleTr: 'Hakkımda & Özgeçmiş',
+          titleEn: 'About & Curriculum Vitae',
+          subTr: 'Deneyim, İTÜ eğitim geçmişi, sertifikalar ve Harvard CV',
+          subEn: 'Experience, ITU education, credentials, and Harvard CV',
+          keywords: 'hakkımda hakkimda cv ozgecmis about resume intertech bidb 2',
+          kbd: '2',
+          run: function () { navigateToUrl('about.html'); }
+        },
+        {
+          groupTr: 'Sayfalar',
+          groupEn: 'Pages',
+          titleTr: 'Projeler & Mimariler',
+          titleEn: 'Projects & Architectures',
+          subTr: 'Tüm 5 teknik vaka çalışması ve sistem diyagramları',
+          subEn: 'All 5 engineering case studies and flow diagrams',
+          keywords: 'projeler projects case study sistem 3',
+          kbd: '3',
+          run: function () { navigateToUrl('projects.html'); }
+        },
+        {
+          groupTr: 'Sayfalar',
+          groupEn: 'Pages',
+          titleTr: "Enis's Career Journey · Oyun",
+          titleEn: "Enis's Career Journey · Game",
+          subTr: 'Etkileşimli 2D piksel platform oyunu ve Sonsuz Mod',
+          subEn: 'Interactive 2D pixel platformer and Endless Mode',
+          keywords: 'oyun game journey enis career 4',
+          kbd: '4',
+          run: function () { navigateToUrl('journey.html'); }
+        },
+        {
+          groupTr: 'Vaka Çalışmaları',
+          groupEn: 'Case Studies',
+          titleTr: 'Borsa Ajanı (v2.0)',
+          titleEn: 'Borsa Ajanı (v2.0)',
+          subTr: 'BIST Yapay Zekâ Analisti · Python · Gemini + Groq',
+          subEn: 'BIST AI Analyst · Python · Gemini + Groq fallback',
+          keywords: 'borsa ajani bist telegram ocr gemini groq python',
+          kbd: '↗',
+          run: function () { navigateToUrl('projects.html#borsa-ajani'); }
+        },
+        {
+          groupTr: 'Vaka Çalışmaları',
+          groupEn: 'Case Studies',
+          titleTr: 'VIRA Finance Agent',
+          titleEn: 'VIRA Finance Agent',
+          subTr: 'Çok ajanlı finansal asistan · LangGraph · RAG',
+          subEn: 'Multi-agent financial assistant · LangGraph · RAG',
+          keywords: 'vira finance agent langgraph langchain rag intertech',
+          kbd: '↗',
+          run: function () { navigateToUrl('projects.html#vira-agent'); }
+        },
+        {
+          groupTr: 'Vaka Çalışmaları',
+          groupEn: 'Case Studies',
+          titleTr: 'Winsock HTTP/1.1 Server',
+          titleEn: 'Winsock HTTP/1.1 Server',
+          subTr: 'C ile çerçevesiz TCP/IP soket sunucusu',
+          subEn: 'Framework-free TCP/IP HTTP/1.1 server in C',
+          keywords: 'winsock http socket c tcp network server',
+          kbd: '↗',
+          run: function () { navigateToUrl('projects.html#winsock-server'); }
+        },
+        {
+          groupTr: 'Vaka Çalışmaları',
+          groupEn: 'Case Studies',
+          titleTr: 'Advanced Native PHP & MySQL CMS',
+          titleEn: 'Advanced Native PHP & MySQL CMS',
+          subTr: 'PDO, bcrypt ve 1:N / N:M ilişkisel CMS mimarisi',
+          subEn: 'PDO, bcrypt auth, and 1:N / N:M relational CMS',
+          keywords: 'php mysql pdo bcrypt cms database',
+          kbd: '↗',
+          run: function () { navigateToUrl('projects.html#php-cms'); }
+        },
+        {
+          groupTr: 'Eylemler',
+          groupEn: 'Actions',
+          titleTr: 'Harvard CV İndir (Türkçe PDF)',
+          titleEn: 'Download Harvard CV (English PDF)',
+          subTr: isEn ? 'enis_cv_en.pdf yeni sekmede açılır' : 'enis_cv_tr.pdf yeni sekmede açılır',
+          subEn: 'Opens Harvard-format PDF resume in new tab',
+          keywords: 'cv pdf download indir harvard resume ozgecmis',
+          kbd: 'PDF',
+          run: function () {
+            window.open(CV_PATHS[currentLang] || CV_PATHS.tr, '_blank', 'noopener');
+          }
+        },
+        {
+          groupTr: 'Eylemler',
+          groupEn: 'Actions',
+          titleTr: 'E-postayı Kopyala',
+          titleEn: 'Copy Email Address',
+          subTr: 'enisotag56@gmail.com panoya kopyalanır',
+          subEn: 'Copy enisotag56@gmail.com to clipboard',
+          keywords: 'email eposta mail copy kopyala contact iletisim enisotag56',
+          kbd: '@',
+          run: function () {
+            copyTextToClipboard('enisotag56@gmail.com').then(function () {
+              announceStatus(isEn ? 'enisotag56@gmail.com copied to clipboard' : 'enisotag56@gmail.com panoya kopyalandı');
+              var labelNode = trigger ? trigger.querySelector('.cmd-trigger-label') : null;
+              if (labelNode) {
+                labelNode.textContent = currentLang === 'en' ? 'Copied ✓' : 'Kopyalandı ✓';
+                window.setTimeout(function () {
+                  labelNode.textContent = currentLang === 'en'
+                    ? (labelNode.getAttribute('data-en') || 'Search')
+                    : (labelNode.getAttribute('data-tr') || 'Ara');
+                }, 1800);
+              }
+            }).catch(function () {});
+          }
+        },
+        {
+          groupTr: 'Eylemler',
+          groupEn: 'Actions',
+          titleTr: 'Temayı Değiştir (Açık / Koyu)',
+          titleEn: 'Toggle Theme (Light / Dark)',
+          subTr: currentTheme === 'dark' ? (isEn ? 'Currently: Dark' : 'Şu an: Koyu') : (isEn ? 'Currently: Light' : 'Şu an: Açık'),
+          subEn: currentTheme === 'dark' ? 'Currently: Dark matte anthracite' : 'Currently: Archival paper light',
+          keywords: 'theme tema dark light koyu acik mode',
+          kbd: 'T',
+          run: function () { setTheme(currentTheme === 'light' ? 'dark' : 'light'); }
+        },
+        {
+          groupTr: 'Eylemler',
+          groupEn: 'Actions',
+          titleTr: 'Dili Değiştir (TR / EN)',
+          titleEn: 'Switch Language (TR / EN)',
+          subTr: 'Türkçe ve İngilizce arasında geçiş yap',
+          subEn: 'Switch interface between Turkish and English',
+          keywords: 'lang dil turkish english tr en',
+          kbd: 'L',
+          run: function () { setLang(currentLang === 'tr' ? 'en' : 'tr'); }
+        },
+        {
+          groupTr: 'Bağlantılar',
+          groupEn: 'Links',
+          titleTr: 'GitHub Profili',
+          titleEn: 'GitHub Profile',
+          subTr: 'github.com/enisotag',
+          subEn: 'github.com/enisotag',
+          keywords: 'github code repo enisotag',
+          kbd: '↗',
+          run: function () { window.open('https://github.com/enisotag', '_blank', 'noopener'); }
+        },
+        {
+          groupTr: 'Bağlantılar',
+          groupEn: 'Links',
+          titleTr: 'LinkedIn Profili',
+          titleEn: 'LinkedIn Profile',
+          subTr: 'linkedin.com/in/suleyman-enis-otag',
+          subEn: 'linkedin.com/in/suleyman-enis-otag',
+          keywords: 'linkedin network profile profil',
+          kbd: '↗',
+          run: function () { window.open('https://www.linkedin.com/in/suleyman-enis-otag/', '_blank', 'noopener'); }
+        }
+      ].map(function (item) {
+        item.mod = mod;
+        return item;
+      });
+    }
+
+    function ensurePaletteDom() {
+      if (backdrop || !document.body || typeof document.createElement !== 'function') return;
+
+      backdrop = document.createElement('div');
+      backdrop.id = 'cmd-palette';
+      backdrop.className = 'cmd-backdrop hidden';
+      backdrop.setAttribute('role', 'dialog');
+      backdrop.setAttribute('aria-modal', 'true');
+
+      var dialog = document.createElement('div');
+      dialog.className = 'cmd-dialog';
+
+      var inputRow = document.createElement('div');
+      inputRow.className = 'cmd-input-row';
+
+      var prefix = document.createElement('span');
+      prefix.className = 'cmd-prefix';
+      prefix.setAttribute('aria-hidden', 'true');
+      prefix.textContent = '>';
+
+      inputEl = document.createElement('input');
+      inputEl.type = 'text';
+      inputEl.className = 'cmd-input';
+      inputEl.setAttribute('autocomplete', 'off');
+      inputEl.setAttribute('spellcheck', 'false');
+
+      var escBtn = document.createElement('button');
+      escBtn.type = 'button';
+      escBtn.className = 'cmd-esc-hint';
+      escBtn.textContent = 'ESC';
+      escBtn.addEventListener('click', closePalette);
+
+      inputRow.appendChild(prefix);
+      inputRow.appendChild(inputEl);
+      inputRow.appendChild(escBtn);
+
+      listEl = document.createElement('div');
+      listEl.className = 'cmd-list';
+      listEl.setAttribute('role', 'listbox');
+
+      footerEl = document.createElement('div');
+      footerEl.className = 'cmd-footer';
+
+      dialog.appendChild(inputRow);
+      dialog.appendChild(listEl);
+      dialog.appendChild(footerEl);
+      backdrop.appendChild(dialog);
+      document.body.appendChild(backdrop);
+
+      backdrop.addEventListener('click', function (e) {
+        if (e.target === backdrop) closePalette();
+      });
+
+      inputEl.addEventListener('input', function () {
+        selectedIdx = 0;
+        renderList();
+      });
+
+      inputEl.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (filteredItems.length) {
+            selectedIdx = (selectedIdx + 1) % filteredItems.length;
+            updateSelectionHighlight();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (filteredItems.length) {
+            selectedIdx = (selectedIdx - 1 + filteredItems.length) % filteredItems.length;
+            updateSelectionHighlight();
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (filteredItems[selectedIdx]) {
+            executeItem(filteredItems[selectedIdx]);
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          closePalette();
+        }
+      });
+    }
+
+    function executeItem(item) {
+      closePalette();
+      if (item && typeof item.run === 'function') {
+        item.run();
+      }
+    }
+
+    function updateSelectionHighlight() {
+      if (!listEl) return;
+      var buttons = listEl.querySelectorAll('.cmd-item');
+      for (var i = 0; i < buttons.length; i++) {
+        var isSel = i === selectedIdx;
+        buttons[i].classList.toggle('is-selected', isSel);
+        buttons[i].setAttribute('aria-selected', String(isSel));
+        if (isSel && typeof buttons[i].scrollIntoView === 'function') {
+          buttons[i].scrollIntoView({ block: 'nearest' });
+        }
+      }
+    }
+
+    function renderList() {
+      if (!listEl || !inputEl) return;
+      var isEn = currentLang === 'en';
+      backdrop.setAttribute('aria-label', isEn ? 'Command Palette' : 'Komut Paleti');
+      inputEl.placeholder = isEn
+        ? 'Search pages, projects, or actions...'
+        : 'Sayfa, proje veya eylem ara...';
+      footerEl.textContent = isEn
+        ? '↑↓ Navigate · Enter Open · Esc Close'
+        : '↑↓ Seç · Enter Aç · Esc Kapat';
+
+      var q = (inputEl.value || '').toLowerCase().trim();
+      var all = getCommands();
+      filteredItems = [];
+
+      for (var i = 0; i < all.length; i++) {
+        var item = all[i];
+        var haystack = (
+          item.titleTr + ' ' + item.titleEn + ' ' + item.subTr + ' ' + item.subEn + ' ' + item.keywords
+        ).toLowerCase();
+        if (!q || haystack.indexOf(q) !== -1) {
+          filteredItems.push(item);
+        }
+      }
+
+      if (selectedIdx >= filteredItems.length) {
+        selectedIdx = Math.max(0, filteredItems.length - 1);
+      }
+
+      listEl.innerHTML = '';
+      if (!filteredItems.length) {
+        var emptyEl = document.createElement('div');
+        emptyEl.className = 'cmd-empty';
+        emptyEl.textContent = isEn ? 'No matching command found.' : 'Eşleşen sonuç bulunamadı.';
+        listEl.appendChild(emptyEl);
+        return;
+      }
+
+      var lastGroup = '';
+      var flatIndex = 0;
+      for (var j = 0; j < filteredItems.length; j++) {
+        (function (entry, idx) {
+          var groupLabel = isEn ? entry.groupEn : entry.groupTr;
+          if (groupLabel !== lastGroup) {
+            lastGroup = groupLabel;
+            var groupEl = document.createElement('div');
+            groupEl.className = 'cmd-group-title';
+            groupEl.textContent = groupLabel;
+            listEl.appendChild(groupEl);
+          }
+
+          var rowBtn = document.createElement('button');
+          rowBtn.type = 'button';
+          rowBtn.className = 'cmd-item' + (idx === selectedIdx ? ' is-selected' : '');
+          rowBtn.setAttribute('role', 'option');
+          rowBtn.setAttribute('aria-selected', String(idx === selectedIdx));
+
+          var mainCol = document.createElement('span');
+          mainCol.className = 'cmd-item-main';
+          var titleSpan = document.createElement('span');
+          titleSpan.className = 'cmd-item-title';
+          titleSpan.textContent = isEn ? entry.titleEn : entry.titleTr;
+          var subSpan = document.createElement('span');
+          subSpan.className = 'cmd-item-sub';
+          subSpan.textContent = isEn ? entry.subEn : entry.subTr;
+          mainCol.appendChild(titleSpan);
+          mainCol.appendChild(subSpan);
+
+          var kbdSpan = document.createElement('span');
+          kbdSpan.className = 'cmd-item-kbd';
+          kbdSpan.textContent = entry.kbd;
+
+          rowBtn.appendChild(mainCol);
+          rowBtn.appendChild(kbdSpan);
+          rowBtn.addEventListener('mouseenter', function () {
+            selectedIdx = idx;
+            updateSelectionHighlight();
+          });
+          rowBtn.addEventListener('click', function () {
+            executeItem(entry);
+          });
+
+          listEl.appendChild(rowBtn);
+        })(filteredItems[j], flatIndex++);
+      }
+    }
+
+    function openPalette() {
+      ensurePaletteDom();
+      if (!backdrop || !inputEl) return;
+      restoreFocusEl = document.activeElement;
+      isOpen = true;
+      selectedIdx = 0;
+      inputEl.value = '';
+      renderList();
+      backdrop.classList.remove('hidden');
+      if (trigger) trigger.setAttribute('aria-expanded', 'true');
+      inputEl.focus();
+    }
+
+    function closePalette() {
+      if (!backdrop || !isOpen) return;
+      isOpen = false;
+      backdrop.classList.add('hidden');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      if (restoreFocusEl && typeof restoreFocusEl.focus === 'function') {
+        restoreFocusEl.focus();
+      } else if (trigger && typeof trigger.focus === 'function') {
+        trigger.focus();
+      }
+      restoreFocusEl = null;
+    }
+
+    if (trigger) {
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.addEventListener('click', function () {
+        if (isOpen) closePalette(); else openPalette();
+      });
+    }
+
+    document.addEventListener('portfolio:langchange', function () {
+      if (isOpen) renderList();
+    });
+
+    document.addEventListener('keydown', function (event) {
+      var key = (event.key || '').toLowerCase();
+      var hasCmdModifier = (event.ctrlKey || event.metaKey) && !event.altKey;
+
+      if (hasCmdModifier && key === 'k') {
+        var fs = document.fullscreenElement || document.webkitFullscreenElement;
+        if (fs) return;
+        event.preventDefault();
+        if (isOpen) closePalette(); else openPalette();
+        return;
+      }
+
+      if (isOpen) {
+        if (key === 'escape') {
+          event.preventDefault();
+          closePalette();
+        }
+        return;
+      }
+
+      if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (isTypingTarget(event.target) || isGamePlayingOnJourneyPage()) return;
+
+      if (key === '/') {
+        event.preventDefault();
+        openPalette();
+      } else if (key === 't') {
+        event.preventDefault();
+        setTheme(currentTheme === 'light' ? 'dark' : 'light');
+      } else if (key === 'l') {
+        event.preventDefault();
+        setLang(currentLang === 'tr' ? 'en' : 'tr');
+      } else if (key === '1') {
+        navigateToUrl('index.html');
+      } else if (key === '2') {
+        navigateToUrl('about.html');
+      } else if (key === '3') {
+        navigateToUrl('projects.html');
+      } else if (key === '4') {
+        navigateToUrl('journey.html');
+      }
+    });
+  }
+
+  var sharedLiveRegion = null;
+  function announceStatus(message) {
+    if (!document.body || typeof document.createElement !== 'function') return null;
+    if (!sharedLiveRegion) {
+      sharedLiveRegion = document.createElement('span');
+      sharedLiveRegion.className = 'sr-only';
+      sharedLiveRegion.setAttribute('aria-live', 'polite');
+      sharedLiveRegion.setAttribute('aria-atomic', 'true');
+      document.body.appendChild(sharedLiveRegion);
+    }
+    if (message) {
+      sharedLiveRegion.textContent = message;
+    }
+    return sharedLiveRegion;
+  }
+
   function init() {
     setTheme(currentTheme, false);
     setLang(currentLang, false, false);
@@ -893,6 +1469,8 @@
     initSectionRail();
     initScrollReveal();
     initPageTransitions();
+    initLinkPrefetch();
+    initCommandPalette();
   }
 
   // Apply root attributes immediately and expose public API
