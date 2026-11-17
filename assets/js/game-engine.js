@@ -503,6 +503,8 @@
             floatingTexts = [];
             if (gameOverUI) gameOverUI.classList.add('hidden');
             if (levelCelebrationUI) levelCelebrationUI.classList.add('hidden');
+            if (hireMeModal) hireMeModal.classList.add('hidden');
+            canvas.style.filter = '';
             canvasContainer.style.filter = '';
 
             // Engeller — Tüm 3 seviyede dengeli boşluklarla (>= 680px)
@@ -1228,6 +1230,7 @@
                 invincibilityTimer = 0;
                 speedHold = 1;
                 lastFrameTime = 0;
+                canvas.style.filter = '';
                 canvasContainer.style.filter = '';
 
                 if (!wasEndless && savedCompleted > 0 && savedCompleted < 3) {
@@ -1262,7 +1265,7 @@
                     lastFrameTime = 0;
                     gameState = 'END_HIRE_ME';
                     if (hireMeModal) hireMeModal.classList.remove('hidden');
-                    canvasContainer.style.filter = 'brightness(0.3)';
+                    canvas.style.filter = 'brightness(0.35)';
                     updatePauseUI();
                     return;
                 }
@@ -1289,6 +1292,7 @@
         if (endlessModeBtn) {
             endlessModeBtn.addEventListener('click', () => {
                 if (hireMeModal) hireMeModal.classList.add('hidden');
+                canvas.style.filter = '';
                 canvasContainer.style.filter = '';
                 endlessMode = true;
                 lastFrameTime = 0;

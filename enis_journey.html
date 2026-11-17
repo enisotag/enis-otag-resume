@@ -676,7 +676,9 @@
             floatingTexts = [];
             gameOverUI.classList.add('hidden');
             levelCelebrationUI.classList.add('hidden');
-            document.getElementById('canvas-container').style.filter = 'none';
+            hireMeModal.classList.add('hidden');
+            canvas.style.filter = '';
+            document.getElementById('canvas-container').style.filter = '';
             
             // Engeller — Tüm 3 seviyede dengeli boşluklarla (>= 680px)
             obstacles = [
@@ -1400,7 +1402,7 @@
                 lastFrameTime = 0;
                 gameState = 'END_HIRE_ME';
                 hireMeModal.classList.remove('hidden');
-                document.getElementById('canvas-container').style.filter = "brightness(0.3)";
+                canvas.style.filter = "brightness(0.35)";
                 return;
             }
 
@@ -1421,6 +1423,7 @@
 
         document.getElementById('endless-mode-btn').addEventListener('click', () => {
             hireMeModal.classList.add('hidden');
+            canvas.style.filter = "";
             document.getElementById('canvas-container').style.filter = "";
             endlessMode = true;
             lastFrameTime = 0;
