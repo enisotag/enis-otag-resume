@@ -27,6 +27,8 @@ portfolio/
     │   ├── main.js             # Bilingual TR/EN switcher, theme toggle, mobile nav, CV links & project filters
     │   └── game-engine.js      # HTML5 Canvas game engine with inline pixel-art assets & 5-language I18N
     ├── img/
+    │   ├── favicon.svg         # Editorial & Swiss Minimalist EO monogram favicon
+    │   ├── og-preview.png      # 1200x630 Open Graph / Twitter social preview card
     │   └── profile.jpg         # Editorial portrait photo displayed on Home (index.html)
     └── cv/
         ├── enis_cv_tr.pdf      # Harvard-style Curriculum Vitae (Türkçe)
@@ -143,7 +145,7 @@ If you prefer a GUI client (such as WinSCP or FileZilla):
 
 1. Open [https://web.itu.edu.tr/otag23/](https://web.itu.edu.tr/otag23/) and verify all navigation tabs (`index.html` Home, `about.html`, `projects.html`, `journey.html`).
 2. Toggle `TR / EN` and `Light / Dark` modes to confirm styles and `localStorage` persistence.
-3. Verify the portrait image (`assets/img/profile.jpg`) and both CV PDFs (`assets/cv/enis_cv_tr.pdf`, `assets/cv/enis_cv_en.pdf`) load cleanly.
+3. Verify the portrait image (`assets/img/profile.jpg`), favicon (`assets/img/favicon.svg`), Open Graph social preview (`assets/img/og-preview.png`), and both CV PDFs (`assets/cv/enis_cv_tr.pdf`, `assets/cv/enis_cv_en.pdf`) load cleanly.
 4. Test project category filters on `projects.html` and launch Level 1 on `journey.html`.
 5. If Apache returns `403 Forbidden`, verify home, directory, and file permissions on the ITU host (adjust `~/public_html` to `~/web.itu.edu.tr` if applicable):
    ```bash

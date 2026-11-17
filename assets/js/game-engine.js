@@ -68,7 +68,7 @@
     TECH_LOGOS.book = ASSET_BOOK;
         let gameState = 'START';
         let gameDistance = 0;
-        let gameSpeed = 3.1;
+        let gameSpeed = 2.6;
         let currentLevel = 1;
         let completedLevels = 0;
         let checkpointDistance = 0;
@@ -106,15 +106,15 @@
             w: 60,
             h: 90,
             vy: 0,
-            jumpPower: -17.5,
-            gravity: 0.68,
+            jumpPower: -16.5,
+            gravity: 0.46,
             grounded: false,
             jumpsRemaining: 2,
             coyoteTimer: 0,
             jumpBufferTimer: 0
         };
 
-        let boss = { active: true, xOffset: 5200, w: 140, h: 140, hp: 2, hurtTimer: 0 };
+        let boss = { active: true, xOffset: 5350, w: 140, h: 140, hp: 2, hurtTimer: 0 };
 
         let items = [];
         let obstacles = [];
@@ -316,7 +316,7 @@
         }
 
         function updateHUD() {
-            currentLevel = gameDistance >= 9800 ? 3 : (gameDistance >= 6200 ? 2 : 1);
+            currentLevel = gameDistance >= 10250 ? 3 : (gameDistance >= 6300 ? 2 : 1);
             const hpVal = Math.max(0, playerHp);
             const scoreStr = playerScore === 0
                 ? '0'
@@ -333,12 +333,12 @@
             let pct = 0;
             if (endlessMode) {
                 pct = 100;
-            } else if (gameDistance < 6200) {
-                pct = (gameDistance / 6200) * 100;
-            } else if (gameDistance < 9800) {
-                pct = ((gameDistance - 6200) / (9800 - 6200)) * 100;
+            } else if (gameDistance < 6300) {
+                pct = (gameDistance / 6300) * 100;
+            } else if (gameDistance < 10250) {
+                pct = ((gameDistance - 6300) / (10250 - 6300)) * 100;
             } else {
-                pct = ((gameDistance - 9800) / (12700 - 9800)) * 100;
+                pct = ((gameDistance - 10250) / (14080 - 10250)) * 100;
             }
             const clampedPct = Math.max(0, Math.min(100, pct));
             const pctStr = clampedPct.toFixed(1);
@@ -478,11 +478,11 @@
             player.vy = 0;
             player.grounded = true;
             player.jumpsRemaining = 2;
-            player.coyoteTimer = 6;
+            player.coyoteTimer = 7;
             player.jumpBufferTimer = 0;
             playerHp = 3;
             playerScore = 0;
-            gameSpeed = 3.1;
+            gameSpeed = 2.6;
             currentLevel = 1;
             completedLevels = 0;
             celebrationLevel = 0;
@@ -499,72 +499,65 @@
             boss.active = true;
             boss.hp = 2;
             boss.hurtTimer = 0;
-            boss.xOffset = 5200;
+            boss.xOffset = 5350;
             floatingTexts = [];
             if (gameOverUI) gameOverUI.classList.add('hidden');
             if (levelCelebrationUI) levelCelebrationUI.classList.add('hidden');
             canvasContainer.style.filter = '';
 
-            // Engeller — Tüm 3 seviyede dengeli boşluklarla (550–850px)
+            // Engeller — Tüm 3 seviyede dengeli boşluklarla (>= 680px)
             obstacles = [
-                // Level 1 (0–6200)
-                { x: 1150, yOffset: 0, w: 70, h: 80, label: 'Zaman Baskısı' },
-                { x: 1950, yOffset: 0, w: 70, h: 80, label: 'Sınav Stresi' },
-                { x: 2800, yOffset: 0, w: 70, h: 80, label: 'Geç Kalma' },
-                { x: 3650, yOffset: 0, w: 70, h: 84, label: 'Kaygı' },
-                { x: 4450, yOffset: 24, w: 52, h: 44, label: 'Kuş', type: 'bird' },
-                // Level 2 (6200–9800)
-                { x: 6850, yOffset: 0, w: 76, h: 86, label: 'Vize', type: 'uni' },
-                { x: 7500, yOffset: 24, w: 52, h: 44, label: 'Kuş', type: 'bird' },
-                { x: 8150, yOffset: 0, w: 76, h: 86, label: 'Algoritma', type: 'uni' },
-                { x: 8850, yOffset: 0, w: 78, h: 86, label: 'Final', type: 'uni' },
-                // Level 3 (9800–12800)
-                { x: 10450, yOffset: 0, w: 74, h: 82, label: 'Bug', type: 'uni' },
-                { x: 11150, yOffset: 0, w: 74, h: 82, label: 'Latency', type: 'uni' },
-                { x: 11800, yOffset: 24, w: 52, h: 44, label: 'Kuş', type: 'bird' },
-                { x: 12300, yOffset: 0, w: 76, h: 84, label: 'Prod Deploy', type: 'uni' }
+                // Level 1 (0–6300)
+                { x: 1250, yOffset: 0, w: 64, h: 72, label: 'Zaman Baskısı' },
+                { x: 2150, yOffset: 0, w: 64, h: 72, label: 'Sınav Stresi' },
+                { x: 3050, yOffset: 0, w: 64, h: 72, label: 'Geç Kalma' },
+                { x: 3950, yOffset: 0, w: 66, h: 74, label: 'Kaygı' },
+                { x: 4650, yOffset: 16, w: 50, h: 40, label: 'Kuş', type: 'bird' },
+                // Level 2 (6300–10100)
+                { x: 6950, yOffset: 0, w: 66, h: 74, label: 'Vize', type: 'uni' },
+                { x: 7750, yOffset: 16, w: 50, h: 40, label: 'Kuş', type: 'bird' },
+                { x: 8550, yOffset: 0, w: 66, h: 74, label: 'Algoritma', type: 'uni' },
+                { x: 9350, yOffset: 0, w: 68, h: 76, label: 'Final', type: 'uni' },
+                // Level 3 (10250–14200)
+                { x: 10950, yOffset: 0, w: 66, h: 74, label: 'Bug', type: 'uni' },
+                { x: 11750, yOffset: 0, w: 66, h: 74, label: 'Latency', type: 'uni' },
+                { x: 12550, yOffset: 16, w: 50, h: 40, label: 'Kuş', type: 'bird' },
+                { x: 13350, yOffset: 0, w: 68, h: 76, label: 'Prod Deploy', type: 'uni' }
             ];
 
-            // Eşyalar (Q-Block / Coin / İksir / Teknoloji)
+            // Eşyalar (Tümü havada — sadece zıplayarak toplanır, engel ve eşya arası >= 340px)
             items = [
                 // Level 1 - 3 Kitap: Çaba + Emek + Disiplin = 97.92 ortalama
-                { x: 900, yOffset: 130, w: 56, h: 48, label: 'Çaba (+32.92)', val: 32.92, type: 'tech', logo: 'book' },
-                { x: 2350, yOffset: 130, w: 56, h: 48, label: 'Emek (+32.5)', val: 32.5, type: 'tech', logo: 'book' },
-                { x: 3250, yOffset: 130, w: 56, h: 48, label: 'Disiplin (+32.5)', val: 32.5, type: 'tech', logo: 'book' },
-                // Hız çiçekleri (yumuşak +1.45x tempo)
-                { x: 1550, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
-                { x: 4100, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
-                { x: 7180, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
-                { x: 8500, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
-                { x: 10920, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
-                { x: 12050, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
-
-                // YKS Sonrası Kupa
-                { x: 5900, yOffset: 80, w: 98, h: 126, label: 'TR 457.', val: 100, type: 'trophy' },
+                { x: 820, yOffset: 135, w: 56, h: 48, label: 'Çaba (+32.92)', val: 32.92, type: 'tech', logo: 'book' },
+                { x: 1700, yOffset: 120, w: 40, h: 40, label: 'Hız +15%!', val: 5, type: 'flower' },
+                { x: 2600, yOffset: 135, w: 56, h: 48, label: 'Emek (+32.5)', val: 32.5, type: 'tech', logo: 'book' },
+                { x: 3500, yOffset: 135, w: 56, h: 48, label: 'Disiplin (+32.5)', val: 32.5, type: 'tech', logo: 'book' },
+                { x: 4300, yOffset: 120, w: 40, h: 40, label: 'Hız +15%!', val: 5, type: 'flower' },
+                { x: 5950, yOffset: 30, w: 98, h: 126, label: 'TR 457.', val: 100, type: 'trophy' },
 
                 // Level 2 - İTÜ Bilgisayar Mühendisliği + BİDB stajı
-                { x: 6520, yOffset: 125, w: 56, h: 56, label: 'C', val: 15, type: 'qblock' },
-                { x: 7820, yOffset: 130, w: 60, h: 60, label: 'C++', val: 15, type: 'tech', logo: 'cpp' },
-                { x: 8480, yOffset: 135, w: 42, h: 56, label: 'Veri Yapıları', val: 15, type: 'coin' },
-                { x: 8620, yOffset: 130, w: 60, h: 60, label: 'Python', val: 15, type: 'tech', logo: 'python' },
-                { x: 9180, yOffset: 135, w: 56, h: 72, label: 'BİDB Stajı', val: 30, type: 'potion' },
-                { x: 9550, yOffset: 80, w: 98, h: 126, label: 'İTÜ DİPLOMASI', val: 150, type: 'trophy' },
+                { x: 6550, yOffset: 135, w: 56, h: 56, label: 'C', val: 15, type: 'qblock' },
+                { x: 7350, yOffset: 120, w: 40, h: 40, label: 'Hız +15%!', val: 5, type: 'flower' },
+                { x: 8150, yOffset: 135, w: 60, h: 60, label: 'C++', val: 15, type: 'tech', logo: 'cpp' },
+                { x: 8950, yOffset: 135, w: 60, h: 60, label: 'Python', val: 15, type: 'tech', logo: 'python' },
+                { x: 9720, yOffset: 135, w: 56, h: 72, label: 'BİDB Stajı', val: 30, type: 'potion' },
+                { x: 10080, yOffset: 30, w: 98, h: 126, label: 'İTÜ DİPLOMASI', val: 150, type: 'trophy' },
 
                 // Level 3 - Intertech Stajı & QNB dönemi
-                { x: 10120, yOffset: 135, w: 56, h: 72, label: 'QNB Stajı', val: 40, type: 'potion' },
-                { x: 10760, yOffset: 135, w: 56, h: 72, label: 'Agentic AI', val: 25, type: 'potion' },
-                { x: 11450, yOffset: 135, w: 56, h: 72, label: 'API & Sistem', val: 25, type: 'potion' },
-                { x: 11640, yOffset: 130, w: 70, h: 60, label: 'DB / SQL', val: 25, type: 'tech', logo: 'sql' },
-                { x: 12050, yOffset: 135, w: 72, h: 90, label: 'Intertech Stajı', val: 60, type: 'potion' },
-                { x: 12700, yOffset: 80, w: 98, h: 126, label: 'SOFTWARE ENGINEER', val: 250, type: 'trophy' }
+                { x: 10550, yOffset: 135, w: 56, h: 72, label: 'QNB Stajı', val: 40, type: 'potion' },
+                { x: 11350, yOffset: 135, w: 56, h: 72, label: 'Agentic AI', val: 25, type: 'potion' },
+                { x: 12150, yOffset: 120, w: 40, h: 40, label: 'Hız +15%!', val: 5, type: 'flower' },
+                { x: 12950, yOffset: 135, w: 70, h: 60, label: 'DB / SQL', val: 25, type: 'tech', logo: 'sql' },
+                { x: 13720, yOffset: 135, w: 72, h: 90, label: 'Intertech Stajı', val: 60, type: 'potion' },
+                { x: 14080, yOffset: 30, w: 98, h: 126, label: 'SOFTWARE ENGINEER', val: 250, type: 'trophy' }
             ];
 
             // Dekoratif Tuğlalar ve Kaktüsleri Oluştur
             decors = [];
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 19; i++) {
                 decors.push({ x: 400 + i * 800, type: 'cactus' });
             }
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 23; i++) {
                 decors.push({ x: 250 + i * 650, type: 'tree' });
             }
             items.forEach((item) => {
@@ -576,7 +569,7 @@
         }
 
         function spawnText(text, x, y, color) {
-            floatingTexts.push({ text, x, y, life: 40, color });
+            floatingTexts.push({ text, x, y, life: 72, color });
         }
 
         function drawTextBg(context, text, x, y, size = 12, color = '#ffffff') {
@@ -620,7 +613,7 @@
         }
 
         function drawBackgrounds(context, now) {
-            const level = gameDistance >= 9800 ? 3 : (gameDistance >= 6200 ? 2 : 1);
+            const level = gameDistance >= 10250 ? 3 : (gameDistance >= 6300 ? 2 : 1);
 
             if (ASSET_BG_SKY.complete && ASSET_BG_SKY.naturalWidth > 0) {
                 const bgH = canvas.height * 1.3;
@@ -659,12 +652,12 @@
             }
 
             if (level === 3) {
-                drawBuilding(ASSET_INTERTECH, 11100, 1, 820);
+                drawBuilding(ASSET_INTERTECH, 11200, 1, 820);
             } else {
                 drawBuilding(ASSET_LISE, 600, 0.5, 820);
                 drawBuilding(ASSET_ITU, 6400, 1, 760);
                 drawBuilding(ASSET_FAKULTE, 7600, 1, 760);
-                drawBuilding(ASSET_BIDB, 8700, 1, 760);
+                drawBuilding(ASSET_BIDB, 9100, 1, 760);
             }
 
             // --- ZEMİN ÇİZİMİ ---
@@ -720,7 +713,7 @@
                 }
             });
 
-            if (boss.active && gameDistance > 3500 && gameDistance < 6000) {
+            if (boss.active && gameDistance > 3500 && gameDistance < 6200) {
                 const bx = boss.xOffset - gameDistance;
                 const by = groundY - boss.h;
                 context.fillStyle = 'rgba(10, 10, 20, 0.32)';
@@ -914,7 +907,7 @@
                 player.vy = 0;
                 player.grounded = true;
                 player.jumpsRemaining = 2;
-                player.coyoteTimer = 6;
+                player.coyoteTimer = 7;
                 if (!wasGrounded) {
                     spawnParticles(player.x + player.w / 2, groundY - 2, 6, 'dust');
                 }
@@ -931,14 +924,14 @@
                     player.jumpsRemaining = 1;
                     spawnParticles(player.x + player.w / 2, groundY - 4, 7, 'dust');
                 } else if (player.jumpsRemaining > 0) {
-                    player.vy = player.jumpPower * 0.86;
+                    player.vy = player.jumpPower * 0.82;
                     player.jumpsRemaining = 0;
                     player.jumpBufferTimer = 0;
                     spawnParticles(player.x + player.w / 2, player.y + player.h - 4, 9, 'sparkle');
                 }
             }
 
-            const speedMultiplier = (speedBoostTimer > 0 ? 1.45 : 1) * speedHold;
+            const speedMultiplier = Math.min(1.4, (speedBoostTimer > 0 ? 1.15 : 1) * speedHold);
             gameDistance += gameSpeed * speedMultiplier * dt;
 
             // Boss Çarpışması & Anti-AFK Duvarı
@@ -974,7 +967,7 @@
                     } else {
                         spawnText('HASAR!', player.x, player.y - 10, '#f00');
                         takeDamage();
-                        gameDistance = Math.max(0, gameDistance - 240);
+                        gameDistance = Math.max(0, gameDistance - 260);
                     }
                 }
 
@@ -986,12 +979,12 @@
                 }
             }
 
-            // Engeller (adil kenar boşluğu: 12px yatay, 8px üst)
+            // Engeller (adil kenar boşluğu: 14px yatay, 12px üst)
             obstacles.forEach((obs) => {
                 if (obs.cleared) return;
                 const ox = obs.x - gameDistance;
                 const oy = groundY - obs.h - obs.yOffset;
-                if (player.x + 12 < ox + obs.w - 12 && player.x + player.w - 12 > ox + 12 && player.y + player.h > oy + 8 && player.y + 8 < oy + obs.h) {
+                if (player.x + 14 < ox + obs.w - 14 && player.x + player.w - 14 > ox + 14 && player.y + player.h > oy + 12 && player.y + 12 < oy + obs.h) {
                     obs.cleared = true;
                     spawnText('ENGEL!', player.x, player.y - 20, '#f00');
                     takeDamage();
@@ -1007,8 +1000,8 @@
                     item.collected = true;
 
                     if (item.type === 'flower') {
-                        speedBoostTimer = 200;
-                        spawnText('Hız +1.5x!', player.x, player.y - 30, '#ff69b4');
+                        speedBoostTimer = 150;
+                        spawnText('Hız +15%!', player.x, player.y - 30, '#ff69b4');
                         spawnParticles(ix + item.w / 2, iy + item.h / 2, 8, 'sparkle');
                     } else if (item.type === 'trophy') {
                         completedLevels = Math.max(completedLevels, currentLevel);
@@ -1016,7 +1009,7 @@
                         spawnText(rewardText, player.x - 40, player.y - 40, '#ffd700');
                         spawnParticles(ix + item.w / 2, iy + item.h / 2, 16, 'sparkle');
                         updateLevelLocks();
-                        checkpointDistance = currentLevel === 1 ? 6200 : (currentLevel === 2 ? 9800 : gameDistance);
+                        checkpointDistance = currentLevel === 1 ? 6300 : (currentLevel === 2 ? 10250 : gameDistance);
                         checkpointScore = playerScore + item.val;
                         lastFrameTime = 0;
                         gameState = 'CELEBRATION';
@@ -1035,8 +1028,8 @@
                 }
             });
 
-            if (!endlessMode && gameDistance > 13200 && completedLevels < 3) {
-                gameDistance = 13180;
+            if (!endlessMode && gameDistance > 14500 && completedLevels < 3) {
+                gameDistance = 14480;
             }
 
             if (endlessMode) {
@@ -1090,8 +1083,8 @@
 
             for (let i = floatingTexts.length - 1; i >= 0; i--) {
                 const ft = floatingTexts[i];
-                ctx.globalAlpha = Math.max(0, ft.life / 40);
-                drawTextBg(ctx, ft.text, ft.x, ft.y - (40 - ft.life), 12, ft.color);
+                ctx.globalAlpha = Math.max(0, ft.life / 72);
+                drawTextBg(ctx, ft.text, ft.x, ft.y - (72 - ft.life) * 0.45, 12, ft.color);
             }
             ctx.globalAlpha = 1;
 
@@ -1119,13 +1112,7 @@
 
         function jump() {
             if (gameState === 'PLAYING') {
-                player.jumpBufferTimer = 10;
-            }
-        }
-
-        function releaseJump() {
-            if (gameState === 'PLAYING' && player.vy < -6) {
-                player.vy *= 0.6;
+                player.jumpBufferTimer = 12;
             }
         }
 
@@ -1167,19 +1154,16 @@
                 if (!e.repeat) jump();
             }
             if (e.code === 'ArrowRight' || e.key === '>' || e.key === '.') {
-                speedHold = 1.55;
+                speedHold = 1.35;
                 e.preventDefault();
             }
             if (e.code === 'ArrowLeft' || e.key === '<' || e.key === ',') {
-                speedHold = 0.6;
+                speedHold = 0.65;
                 e.preventDefault();
             }
         });
 
         window.addEventListener('keyup', (e) => {
-            if (e.code === 'Space' || e.code === 'ArrowUp') {
-                releaseJump();
-            }
             if (e.code === 'ArrowRight' || e.code === 'ArrowLeft' || e.key === '>' || e.key === '<' || e.key === '.' || e.key === ',') {
                 speedHold = 1;
             }
@@ -1199,15 +1183,11 @@
             }
         }, { passive: false });
 
-        canvas.addEventListener('touchend', () => releaseJump());
-        canvas.addEventListener('touchcancel', () => releaseJump());
-
         canvas.addEventListener('mousedown', (e) => {
             if (gameState === 'PLAYING' && e.button === 0) {
                 jump();
             }
         });
-        canvas.addEventListener('mouseup', () => releaseJump());
 
         if (touchLayer) {
             touchLayer.addEventListener('touchstart', (e) => {
@@ -1216,8 +1196,6 @@
                     jump();
                 }
             }, { passive: false });
-            touchLayer.addEventListener('touchend', () => releaseJump());
-            touchLayer.addEventListener('touchcancel', () => releaseJump());
         }
 
         if (startRunBtn) {
@@ -1265,7 +1243,7 @@
                     playerScore = 0;
                 }
 
-                currentLevel = gameDistance >= 9800 ? 3 : (gameDistance >= 6200 ? 2 : 1);
+                currentLevel = gameDistance >= 10250 ? 3 : (gameDistance >= 6300 ? 2 : 1);
                 lastHudKey = '';
                 updateLevelLocks();
                 updateHUD();
@@ -1290,12 +1268,12 @@
                 }
 
                 // Her yeni bölüm yalnızca önceki bölümün ödülü alındığında açılır.
-                gameDistance = celebrationLevel === 1 ? 6200 : 9800;
+                gameDistance = celebrationLevel === 1 ? 6300 : 10250;
                 player.y = groundY - player.h;
                 player.vy = 0;
                 player.grounded = true;
                 player.jumpsRemaining = 2;
-                player.coyoteTimer = 6;
+                player.coyoteTimer = 7;
                 player.jumpBufferTimer = 0;
                 speedHold = 1;
                 lastFrameTime = 0;
@@ -1376,22 +1354,22 @@
                 items.length ? items[items.length - 1].x : 0
             );
             if (furthestX - gameDistance < canvas.width * 1.5) {
-                const nx = furthestX + 550 + Math.random() * 250;
+                const nx = furthestX + 560 + Math.random() * 240;
                 if (Math.random() < 0.55) {
                     const kinds = [
-                        { w: 70, h: 82, yOffset: 0, label: 'Zorluk' },
-                        { w: 52, h: 44, yOffset: 24, label: 'Kuş', type: 'bird' }
+                        { w: 66, h: 74, yOffset: 0, label: 'Zorluk' },
+                        { w: 50, h: 40, yOffset: 16, label: 'Kuş', type: 'bird' }
                     ];
                     const k = kinds[Math.floor(Math.random() * kinds.length)];
                     obstacles.push({ x: nx, yOffset: k.yOffset, w: k.w, h: k.h, label: k.label, type: k.type });
                 } else {
                     const r = Math.random();
                     if (r < 0.3) {
-                        items.push({ x: nx, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' });
+                        items.push({ x: nx, yOffset: 120, w: 40, h: 40, label: 'Hız +15%!', val: 5, type: 'flower' });
                     } else {
                         const logos = ['book', 'python', 'sql', 'cpp'];
                         const lg = logos[Math.floor(Math.random() * logos.length)];
-                        items.push({ x: nx, yOffset: 130, w: 56, h: 52, label: lg, val: 10, type: 'tech', logo: lg });
+                        items.push({ x: nx, yOffset: 135, w: 56, h: 52, label: lg, val: 10, type: 'tech', logo: lg });
                     }
                 }
             }
