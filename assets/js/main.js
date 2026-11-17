@@ -111,6 +111,9 @@
 
     updateLangButton();
     updateThemeButton();
+    if (typeof updateIstanbulClock === 'function') {
+      updateIstanbulClock();
+    }
   }
 
   function setTheme(theme, persist) {
@@ -663,12 +666,140 @@
     }
   }
 
+  function getIstanbulTimeParts(now) {
+    var d = now || new Date();
+    try {
+      if (typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function') {
+        var fmt = new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Europe/Istanbul',
+          hour: '2-digit',
+          minute: '2-digit',
+          weekday: 'short',
+          hour12: false
+        });
+        if (typeof fmt.formatToParts === 'function') {
+          var parts = fmt.formatToParts(d);
+          var map = {};
+          for (var i = 0; i < parts.length; i++) {
+            map[parts[i].type] = parts[i].value;
+          }
+          var h = parseInt(map.hour, 10);
+          var m = parseInt(map.minute, 10);
+          if (!isNaN(h) && !isNaN(m)) {
+            if (h === 24) h = 0;
+            var hh = (h < 10 ? '0' : '') + h;
+            var mm = (m < 10 ? '0' : '') + m;
+            var wk = map.weekday || '';
+            return {
+              hour: h,
+              minute: m,
+              formatted: hh + ':' + mm,
+              isWeekend: wk === 'Sat' || wk === 'Sun'
+            };
+          }
+        }
+      }
+    } catch (e) {
+      // Fallback to deterministic UTC+3 arithmetic below
+    }
+
+    var trt = new Date(d.getTime() + 180 * 60000);
+    var fh = trt.getUTCHours();
+    var fm = trt.getUTCMinutes();
+    var fday = trt.getUTCDay();
+    return {
+      hour: fh,
+      minute: fm,
+      formatted: (fh < 10 ? '0' : '') + fh + ':' + (fm < 10 ? '0' : '') + fm,
+      isWeekend: fday === 0 || fday === 6
+    };
+  }
+
+  function formatOffsetHint(now, lang) {
+    var diffMinutes = 180 + now.getTimezoneOffset();
+    if (diffMinutes === 0) return '';
+    var sign = diffMinutes > 0 ? '+' : '-';
+    var absMin = Math.abs(diffMinutes);
+    var hrs = Math.floor(absMin / 60);
+    var rem = absMin % 60;
+    var val = rem ? (hrs + ':' + (rem < 10 ? '0' : '') + rem) : String(hrs);
+    return lang === 'en'
+      ? ' · ' + sign + val + 'h vs your time'
+      : ' · Yerel saatinizle ' + sign + val + ' sa';
+  }
+
+  function updateIstanbulClock() {
+    var clocks = document.querySelectorAll('[data-istanbul-clock]');
+    var statuses = document.querySelectorAll('[data-istanbul-status]');
+    var dots = document.querySelectorAll('[data-istanbul-dot]');
+    if (!clocks.length && !statuses.length && !dots.length) return;
+
+    var now = new Date();
+    var parts = getIstanbulTimeParts(now);
+    var isEn = currentLang === 'en';
+    var timeLabel = parts.formatted + ' TRT (UTC+3)';
+
+    for (var i = 0; i < clocks.length; i++) {
+      var el = clocks[i];
+      var mode = el.getAttribute('data-istanbul-clock');
+      var nextText = mode === 'inline'
+        ? '· ' + timeLabel
+        : (mode === 'compact' ? timeLabel : 'İstanbul · ' + timeLabel);
+      if (el.textContent !== nextText) {
+        el.textContent = nextText;
+      }
+    }
+
+    var stateClass = 'is-evening';
+    var statusLabel = isEn
+      ? 'Flexible hours · Replies when available'
+      : 'Esnek saatler · İlk fırsatta dönüş yapılır';
+
+    if (!parts.isWeekend && parts.hour >= 9 && parts.hour < 20) {
+      stateClass = 'is-active';
+      statusLabel = isEn
+        ? 'Active hours · Quick response window'
+        : 'Çalışma saatleri · Hızlı yanıt penceresi';
+    } else if (parts.hour >= 23 || parts.hour < 9) {
+      stateClass = 'is-quiet';
+      statusLabel = isEn
+        ? 'Night hours in Istanbul · Leave an email anytime'
+        : 'Gece saatleri · Dilediğiniz zaman e-posta bırakabilirsiniz';
+    }
+
+    var fullStatus = statusLabel + formatOffsetHint(now, currentLang);
+    for (var j = 0; j < statuses.length; j++) {
+      if (statuses[j].textContent !== fullStatus) {
+        statuses[j].textContent = fullStatus;
+      }
+    }
+
+    for (var k = 0; k < dots.length; k++) {
+      dots[k].classList.remove('is-active', 'is-evening', 'is-quiet');
+      dots[k].classList.add(stateClass);
+    }
+  }
+
+  function initIstanbulClock() {
+    updateIstanbulClock();
+    var clocks = document.querySelectorAll('[data-istanbul-clock], [data-istanbul-status]');
+    if (!clocks.length) return;
+
+    window.setInterval(updateIstanbulClock, 15000);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) {
+        updateIstanbulClock();
+      }
+    });
+  }
+
   function init() {
     setTheme(currentTheme, false);
     setLang(currentLang, false, false);
     highlightActiveNav();
     initControls();
     initCopyEmailButtons();
+    initIstanbulClock();
     initMobileNav();
     initProjectFilters();
     initScrollReveal();

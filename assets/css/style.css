@@ -287,6 +287,57 @@ html[lang="en"] [data-lang-block="tr"] {
   background-color: var(--bg-subtle);
 }
 
+.meta-time {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.availability-strip {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 20px;
+  padding: 12px 18px;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.availability-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.availability-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: var(--text-muted);
+}
+
+.availability-dot.is-active {
+  background-color: var(--accent);
+}
+
+.availability-dot.is-quiet {
+  background-color: transparent;
+  border: 1.5px solid var(--text-muted);
+}
+
+.availability-status {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 .stack-sm {
   display: flex;
   flex-direction: column;
@@ -1764,6 +1815,9 @@ html.reveal-ready .card-interactive.reveal-item.is-visible:hover {
   .btn,
   .control-btn,
   .copy-email-btn,
+  .meta-time,
+  .availability-strip,
+  .footer-clock,
   .mobile-nav-toggle,
   .hero-actions,
   .journey-toolbar,
