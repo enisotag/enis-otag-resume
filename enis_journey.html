@@ -142,9 +142,9 @@
                         <div class="border-l-2 border-gray-700 pl-4 relative">
                             <div class="absolute w-3 h-3 bg-purple-500 rounded-full -left-[7px] top-1"></div>
                             <h4 class="text-lg font-semibold text-white">Intertech</h4>
-                            <p class="text-sm text-purple-300 mb-2">Software Engineer Intern | AI Lab</p>
+                            <p class="text-sm text-purple-300 mb-2">Software Engineering Intern</p>
                             <p class="text-gray-400 text-sm">
-                                Yapay zeka laboratuvarında RAG (Retrieval-Augmented Generation) ve LangChain tabanlı projeler üzerinde çalışıldı. LLM modelleri ile kurumsal verilere dayalı akıllı asistan geliştirme süreçlerine katkı sağlandı.
+                                Intertech stajı kapsamında kurumsal bankacılık ve finansal veri işleme süreçleri için yazılım geliştirme, API entegrasyonları ve yapay zekâ destekli iş akışları üzerinde çalışıldı.
                             </p>
                         </div>
                     </div>
@@ -164,7 +164,7 @@
                             <div class="absolute w-3 h-3 bg-gray-600 rounded-full -left-[7px] top-1"></div>
                             <h4 class="text-lg font-semibold text-white">Eskişehir Fatih Fen Lisesi</h4>
                             <p class="text-sm text-purple-300 mb-2">Lise Eğitimi (2019 - 2023)</p>
-                            <p class="text-gray-400 text-sm">97.9 ortalama ile mezuniyet. YKS sürecinde Türkiye 457.si derecesi elde edildi.</p>
+                            <p class="text-gray-400 text-sm">97,92/100 ortalama ile mezuniyet. YKS sürecinde Türkiye 457.si derecesi elde edildi.</p>
                         </div>
                     </div>
                 </div>
@@ -206,7 +206,7 @@
                 <span>LIFE x<span id="ui-hp">3</span></span>
             </div>
             <div class="pixel-font text-white text-base md:text-2xl lg:text-3xl hidden md:block mt-1" style="text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">
-                LEVEL <span id="ui-level">1</span> · <span id="ui-level-name">LİSE</span>
+                LEVEL <span id="ui-level">1</span> · <span id="ui-level-name">FEN LİSESİ</span>
             </div>
             <button id="close-game-btn" class="text-white hover:text-red-400 font-bold text-3xl pointer-events-auto" style="text-shadow: 2px 2px 0 #000;">&times;</button>
         </div>
@@ -248,9 +248,9 @@
                 </h2>
                 <p id="txt-instructions" class="pixel-font text-xs text-gray-300 mb-6 text-center max-w-md leading-loose px-4">
                     Karakter otomatik koşar.<br><br>
-                    Zıplamak için [BOŞLUK] tuşuna bas<br>veya ekrana dokun.<br><br>
+                    Zıplamak ve Çift Zıplamak için [BOŞLUK] / [↑]<br>tuşuna bas veya ekrana dokun.<br><br>
                     Engelleri aş, güçlendirmeleri topla!<br>
-                    <span class="text-cyan-300">&lt; / &gt;</span> ile hızını ayarla.
+                    <span class="text-cyan-300">&lt; / &gt;</span> hız · <span class="text-cyan-300">[P]</span> duraklat.
                 </p>
                 <div class="flex gap-2 mb-6" id="lang-picker">
                     <button data-lang="tr" class="lang-btn px-2 py-1 rounded text-lg border-2 border-white/30">🇹🇷</button>
@@ -262,15 +262,15 @@
                 <div class="grid grid-cols-3 gap-2 w-full max-w-2xl px-4 mb-7 text-center">
                     <div class="border-2 border-green-400 bg-green-900/40 p-3 rounded">
                         <div class="text-2xl mb-2">🏫</div><div class="pixel-font text-[9px] text-green-300">LEVEL 1</div>
-                        <div class="text-xs mt-2">FEN LİSESİ</div><div id="lock-level-1" class="text-xs mt-2 text-green-300">🔓 AÇIK</div>
+                        <div id="card-label-1" class="text-xs mt-2">FEN LİSESİ</div><div id="lock-level-1" class="text-xs mt-2 text-green-300">🔓 AÇIK</div>
                     </div>
                     <div class="border-2 border-yellow-500/70 bg-yellow-900/20 p-3 rounded">
                         <div class="text-2xl mb-2">🎓</div><div class="pixel-font text-[9px] text-yellow-200">LEVEL 2</div>
-                        <div class="text-xs mt-2">İTÜ</div><div id="lock-level-2" class="text-xs mt-2 text-yellow-200">🔒 KİLİTLİ</div>
+                        <div id="card-label-2" class="text-xs mt-2">İTÜ</div><div id="lock-level-2" class="text-xs mt-2 text-yellow-200">🔒 KİLİTLİ</div>
                     </div>
                     <div class="border-2 border-purple-500/70 bg-purple-900/20 p-3 rounded">
                         <div class="text-2xl mb-2">💻</div><div class="pixel-font text-[9px] text-purple-200">LEVEL 3</div>
-                        <div class="text-xs mt-2">INTERTECH</div><div id="lock-level-3" class="text-xs mt-2 text-purple-200">🔒 KİLİTLİ</div>
+                        <div id="card-label-3" class="text-xs mt-2">INTERTECH STAJI</div><div id="lock-level-3" class="text-xs mt-2 text-purple-200">🔒 KİLİTLİ</div>
                     </div>
                 </div>
                 <button id="start-run-btn" class="pixel-font btn-play text-white px-8 py-4 rounded text-sm">OYUNA BAŞLA</button>
@@ -287,7 +287,7 @@
                     </h2>
                     
                     <p id="txt-hire" class="font-sans text-gray-300 mb-10 text-sm md:text-base max-w-lg mx-auto">
-                        Tebrikler! Lise, İTÜ ve Intertech simülasyonunu başarıyla tamamladın. Hikayenin bir sonraki bölümünü yazmak için benimle iletişime geç!
+                        Tebrikler! Lise, İTÜ ve Intertech Stajı simülasyonunu başarıyla tamamladın. Hikayenin bir sonraki bölümünü yazmak için benimle iletişime geç!
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans mb-8 relative z-10">
@@ -340,6 +340,7 @@
             sidebar.classList.add('open');
             backdrop.classList.add('open');
             document.body.style.overflow = 'hidden'; // Arka plan kaymasını engelle
+            lastFrameTime = 0;
             resizeCanvas();
         });
 
@@ -347,7 +348,9 @@
             sidebar.classList.remove('open');
             backdrop.classList.remove('open');
             document.body.style.overflow = 'auto';
-            gameState = 'PAUSED'; // Çıkınca oyunu durdur
+            lastFrameTime = 0;
+            speedHold = 1;
+            if (gameState === 'PLAYING') gameState = 'PAUSED'; // Çıkınca oyunu durdur
         });
 
         // --- OYUN MOTORU ---
@@ -389,7 +392,7 @@
         
         let gameState = 'START'; 
         let gameDistance = 0; 
-        let gameSpeed = 16; 
+        let gameSpeed = 3.1; 
         let currentLevel = 1;
         let completedLevels = 0;
         let checkpointDistance = 0;
@@ -397,6 +400,8 @@
         let celebrationLevel = 0;
         let groundY = 0;
         let floatingTexts = [];
+        let lastFrameTime = 0;
+        let lastHudKey = '';
         
         let playerHp = 3;
         let playerScore = 0;
@@ -413,9 +418,12 @@
             w: 60,
             h: 90,
             vy: 0,
-            jumpPower: -13.8, 
-            gravity: 0.72,   
-            grounded: false
+            jumpPower: -17.5, 
+            gravity: 0.68,   
+            grounded: false,
+            jumpsRemaining: 2,
+            coyoteTimer: 0,
+            jumpBufferTimer: 0
         };
 
         let boss = { active: true, xOffset: 5200, w: 140, h: 140, hp: 2, hurtTimer: 0 };
@@ -424,31 +432,70 @@
         let obstacles = [];
         let decors = []; // Çevre dekorları (Tuğlalar, kaktüsler)
 
+        const particles = Array.from({ length: 64 }, () => ({
+            active: false, x: 0, y: 0, vx: 0, vy: 0, gravity: 0, size: 4, life: 0, maxLife: 1, color: '#fff'
+        }));
+
+        function spawnParticles(x, y, count, kind) {
+            let spawned = 0;
+            for (let i = 0; i < particles.length && spawned < count; i++) {
+                const p = particles[i];
+                if (p.active) continue;
+                p.active = true;
+                p.x = x + (Math.random() - 0.5) * 14;
+                p.y = y + (Math.random() - 0.5) * 8;
+                if (kind === 'hit') {
+                    p.vx = (Math.random() - 0.5) * 5.8;
+                    p.vy = -Math.random() * 4.6 - 1.4;
+                    p.gravity = 0.22;
+                    p.size = 5 + Math.floor(Math.random() * 3);
+                    p.maxLife = 20 + Math.random() * 10;
+                    p.color = spawned % 2 === 0 ? '#fc8181' : '#ffd700';
+                } else if (kind === 'sparkle') {
+                    p.vx = (Math.random() - 0.5) * 4.4;
+                    p.vy = -Math.random() * 3.8 - 1.0;
+                    p.gravity = 0.12;
+                    p.size = 4 + Math.floor(Math.random() * 3);
+                    p.maxLife = 18 + Math.random() * 10;
+                    p.color = spawned % 2 === 0 ? '#39ff14' : '#ffd700';
+                } else {
+                    p.vx = (Math.random() - 0.5) * 3.2;
+                    p.vy = -Math.random() * 2.2 - 0.5;
+                    p.gravity = 0.14;
+                    p.size = 4 + Math.floor(Math.random() * 2);
+                    p.maxLife = 14 + Math.random() * 8;
+                    p.color = spawned % 2 === 0 ? '#e2e8f0' : '#94a3b8';
+                }
+                p.life = p.maxLife;
+                spawned++;
+            }
+        }
+
         const I18N = {
-            tr: { instructions: 'Karakter otomatik koşar.<br><br>Zıplamak için [BOŞLUK] tuşuna bas<br>veya ekrana dokun.<br><br>Engelleri aş, güçlendirmeleri topla!<br><span class="text-cyan-300">&lt; / &gt;</span> ile hızını ayarla.',
+            tr: { instructions: 'Karakter otomatik koşar.<br><br>Zıplamak ve Çift Zıplamak için [BOŞLUK] / [↑]<br>tuşuna bas veya ekrana dokun.<br><br>Engelleri aş, güçlendirmeleri topla!<br><span class="text-cyan-300">&lt; / &gt;</span> hız · <span class="text-cyan-300">[P]</span> duraklat.',
                 start: 'OYUNA BAŞLA', unlocked: '🔓 AÇIK', locked: '🔒 KİLİTLİ', completed: '🔓 TAMAMLANDI',
                 gameover: 'Kariyer yolculuğunda ufak bir tökezleme! Ama pes etmek yok, kodlamaya ve gelişmeye devam!', restart: 'YENİDEN OYNA 🔄',
-                hire: 'Tebrikler! Lise, İTÜ ve Intertech simülasyonunu başarıyla tamamladın. Hikayenin bir sonraki bölümünü yazmak için benimle iletişime geç!',
+                hire: 'Tebrikler! Lise, İTÜ ve Intertech Stajı simülasyonunu başarıyla tamamladın. Hikayenin bir sonraki bölümünü yazmak için benimle iletişime geç!',
                 schedule: 'Toplantı Planla ☕', endless: '🎮 SONSUZ MODDA DEVAM ET (Yüksek Skor)', dir: 'ltr' },
-            en: { instructions: 'The character runs automatically.<br><br>Press [SPACE] to jump<br>or tap the screen.<br><br>Dodge obstacles, collect power-ups!<br><span class="text-cyan-300">&lt; / &gt;</span> to adjust your speed.',
+            en: { instructions: 'The character runs automatically.<br><br>Press [SPACE] / [↑] to Jump &amp; Double Jump<br>or tap the screen.<br><br>Dodge obstacles, collect power-ups!<br><span class="text-cyan-300">&lt; / &gt;</span> speed · <span class="text-cyan-300">[P]</span> pause.',
                 start: 'START GAME', unlocked: '🔓 UNLOCKED', locked: '🔒 LOCKED', completed: '🔓 COMPLETED',
                 gameover: 'A small stumble on the career journey! But never give up — keep coding and growing!', restart: 'PLAY AGAIN 🔄',
-                hire: 'Congrats! You completed the Lise, İTÜ and Intertech simulation. Get in touch with me to write the next chapter of the story!',
+                hire: 'Congrats! You completed the High School, İTÜ and Intertech Internship simulation. Get in touch with me to write the next chapter of the story!',
                 schedule: 'Schedule a Meeting ☕', endless: '🎮 CONTINUE IN ENDLESS MODE (High Score)', dir: 'ltr' },
-            ar: { instructions: 'الشخصية تجري تلقائيًا.<br><br>اضغط [مسافة] للقفز<br>أو المس الشاشة.<br><br>تجنب العقبات واجمع التعزيزات!<br><span class="text-cyan-300">&lt; / &gt;</span> لتعديل سرعتك.',
+            ar: { instructions: 'الشخصية تجري تلقائيًا.<br><br>اضغط [مسافة] / [↑] للقفز والقفز المزدوج<br>أو المس الشاشة.<br><br>تجنب العقبات واجمع التعزيزات!<br><span class="text-cyan-300">&lt; / &gt;</span> السرعة · <span class="text-cyan-300">[P]</span> إيقاف مؤقت.',
                 start: 'ابدأ اللعبة', unlocked: '🔓 مفتوح', locked: '🔒 مقفل', completed: '🔓 مكتمل',
                 gameover: 'عثرة صغيرة في رحلة مسيرتك المهنية! لكن لا تستسلم، استمر بالبرمجة والتطور!', restart: 'إعادة اللعب 🔄',
-                hire: 'تهانينا! أكملت محاكاة الثانوية وجامعة İTÜ وIntertech. تواصل معي لكتابة الفصل التالي من القصة!',
+                hire: 'تهانينا! أكملت محاكاة الثانوية وجامعة İTÜ وتدريب Intertech. تواصل معي لكتابة الفصل التالي من القصة!',
                 schedule: 'حدد موعد اجتماع ☕', endless: '🎮 تابع في الوضع اللانهائي (أعلى نتيجة)', dir: 'rtl' },
-            es: { instructions: 'El personaje corre automáticamente.<br><br>Presiona [ESPACIO] para saltar<br>o toca la pantalla.<br><br>¡Esquiva obstáculos y recoge potenciadores!<br><span class="text-cyan-300">&lt; / &gt;</span> para ajustar tu velocidad.',
+            es: { instructions: 'El personaje corre automáticamente.<br><br>Presiona [ESPACIO] / [↑] para Saltar y Doble Salto<br>o toca la pantalla.<br><br>¡Esquiva obstáculos y recoge potenciadores!<br><span class="text-cyan-300">&lt; / &gt;</span> velocidad · <span class="text-cyan-300">[P]</span> pausa.',
                 start: 'EMPEZAR JUEGO', unlocked: '🔓 DESBLOQUEADO', locked: '🔒 BLOQUEADO', completed: '🔓 COMPLETADO',
                 gameover: '¡Un pequeño tropiezo en tu trayectoria profesional! Pero no te rindas, ¡sigue programando y creciendo!', restart: 'JUGAR DE NUEVO 🔄',
-                hire: '¡Felicidades! Completaste la simulación de Lise, İTÜ e Intertech. ¡Contáctame para escribir el siguiente capítulo de la historia!',
+                hire: '¡Felicidades! Completaste la simulación de Secundaria, İTÜ y Prácticas en Intertech. ¡Contáctame para escribir el siguiente capítulo de la historia!',
                 schedule: 'Agendar una Reunión ☕', endless: '🎮 CONTINUAR EN MODO INFINITO (Mejor Puntaje)', dir: 'ltr' },
-            ja: { instructions: 'キャラクターは自動的に走ります。<br><br>[スペース]キーでジャンプ<br>または画面をタップ。<br><br>障害物を避けてパワーアップを集めよう！<br><span class="text-cyan-300">&lt; / &gt;</span> で速度を調整。',
+            ja: { instructions: 'キャラクターは自動的に走ります。<br><br>[スペース] / [↑] でジャンプ＆二段ジャンプ<br>または画面をタップ。<br><br>障害物を避けてパワーアップを集めよう！<br><span class="text-cyan-300">&lt; / &gt;</span> 速度 · <span class="text-cyan-300">[P]</span> 一時停止。',
                 start: 'ゲームスタート', unlocked: '🔓 解放済み', locked: '🔒 ロック中', completed: '🔓 完了',
                 gameover: 'キャリアの旅でちょっとしたつまずき！でも諦めずにコーディングと成長を続けよう！', restart: 'もう一度プレイ 🔄',
-                hire: 'おめでとうございます！高校、İTÜ、Intertechのシミュレーションを完了しました。物語の次の章を一緒に書くために連絡してください！',
+                hire: 'おめでとうございます！高校、İTÜ、Intertechインターンシップのシミュレーションを完了しました。物語の次の章を一緒に書くために連絡してください！',
                 schedule: 'ミーティングを予約 ☕', endless: '🎮 エンドレスモードを続ける（ハイスコア）', dir: 'ltr' }
         };
         let currentLang = 'tr';
@@ -466,7 +513,11 @@
             const sc = document.getElementById('txt-schedule'); if (sc) sc.innerHTML = t.schedule;
             const em = document.getElementById('endless-mode-btn'); if (em) em.textContent = t.endless;
             document.querySelectorAll('.lang-btn').forEach(b => b.style.outline = b.dataset.lang === lang ? '2px solid #39ff14' : 'none');
+            const card1 = document.getElementById('card-label-1'); if (card1) card1.textContent = lang === 'en' ? 'HIGH SCHOOL' : 'FEN LİSESİ';
+            const card3 = document.getElementById('card-label-3'); if (card3) card3.textContent = lang === 'en' ? 'INTERTECH INTERNSHIP' : 'INTERTECH STAJI';
+            lastHudKey = '';
             updateLevelLocks();
+            updateHUD();
         }
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', () => setLang(btn.dataset.lang));
@@ -477,34 +528,76 @@
             const lock1 = document.getElementById('lock-level-1');
             const lock2 = document.getElementById('lock-level-2');
             const lock3 = document.getElementById('lock-level-3');
-            if (lock1) lock1.textContent = t.completed;
-            if (lock2) lock2.textContent = completedLevels >= 1 ? t.unlocked : t.locked;
-            if (lock3) lock3.textContent = completedLevels >= 2 ? t.unlocked : t.locked;
+            if (lock1) lock1.textContent = completedLevels >= 1 ? t.completed : t.unlocked;
+            if (lock2) lock2.textContent = completedLevels >= 2 ? t.completed : (completedLevels >= 1 ? t.unlocked : t.locked);
+            if (lock3) lock3.textContent = completedLevels >= 3 ? t.completed : (completedLevels >= 2 ? t.unlocked : t.locked);
         }
 
         function updateHUD() {
-            uiHp.innerText = Math.max(0, playerHp);
-            uiScore.innerText = playerScore <= 100 ? (playerScore.toFixed(1)) : Math.floor(playerScore);
             currentLevel = gameDistance >= 9800 ? 3 : (gameDistance >= 6200 ? 2 : 1);
+            const hpVal = Math.max(0, playerHp);
+            const scoreStr = playerScore === 0
+                ? '0'
+                : (playerScore < 100
+                    ? (Math.abs(playerScore - Math.round(playerScore)) < 0.005 ? String(Math.round(playerScore)) : playerScore.toFixed(2))
+                    : String(Math.floor(playerScore)));
+            const isEn = currentLang === 'en';
+            const levelNameStr = endlessMode
+                ? (isEn ? 'ENDLESS MODE · Best: ' : 'SONSUZ MOD · En İyi: ') + bestScore
+                : (currentLevel === 1
+                    ? (isEn ? 'HIGH SCHOOL' : 'FEN LİSESİ')
+                    : (currentLevel === 2 ? 'İTÜ' : (isEn ? 'INTERTECH INTERNSHIP' : 'INTERTECH STAJI')));
+            const hudKey = `${hpVal}|${scoreStr}|${currentLevel}|${levelNameStr}|${completedLevels}|${currentLang}`;
+            if (hudKey === lastHudKey) return;
+            lastHudKey = hudKey;
+
+            uiHp.innerText = hpVal;
+            uiScore.innerText = scoreStr;
             uiLevel.innerText = currentLevel;
-            if (endlessMode) {
-                uiLevelName.innerText = 'SONSUZ MOD · En İyi: ' + bestScore;
-            } else {
-                uiLevelName.innerText = currentLevel === 1 ? 'FEN LİSESİ' : (currentLevel === 2 ? 'İTÜ' : 'INTERTECH');
-            }
+            uiLevelName.innerText = levelNameStr;
             updateLevelLocks();
         }
 
         function showLevelCelebration(level) {
+            lastFrameTime = 0;
             celebrationLevel = level;
             const title = levelCelebrationUI.querySelector('h2');
             const message = levelCelebrationUI.querySelector('p');
             const button = document.getElementById('continue-level-btn');
-            const milestones = {
+            const isEn = currentLang === 'en';
+            const milestones = isEn ? {
+                1: {
+                    title: 'LEVEL 1 COMPLETE!',
+                    message: 'Ranked 457th nationwide! Defeated the YKS boss with 97.92 GPA.<br><div class="flex flex-wrap gap-2 justify-center mt-4 mb-2 font-sans">' +
+                        '<span class="px-3 py-1 bg-green-900/60 border border-green-400 rounded text-xs md:text-sm">🎓 97.92/100 GPA</span>' +
+                        '<span class="px-3 py-1 bg-green-900/60 border border-green-400 rounded text-xs md:text-sm">🏫 Eskişehir Fatih Fen Lisesi</span>' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">💪 Effort</span>' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">📏 Discipline</span></div>🏆 First career badge earned. İTÜ gates are now open!',
+                    button: 'UNLOCK İTÜ STAGE 🔓'
+                },
+                2: {
+                    title: 'LEVEL 2 COMPLETE!',
+                    message: 'Completed your İTÜ Computer Engineering journey!<br><div class="flex flex-wrap gap-2 justify-center mt-4 mb-2 font-sans">' +
+                        '<span class="px-3 py-1 bg-green-900/60 border border-green-400 rounded text-xs md:text-sm">💻 C / C++ / Python</span>' +
+                        '<span class="px-3 py-1 bg-green-900/60 border border-green-400 rounded text-xs md:text-sm">🧮 Algorithms</span>' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">🏢 BİDB Internship</span></div>🎓 Second badge earned. Intertech Internship stage is now open!',
+                    button: 'UNLOCK INTERTECH INTERNSHIP 🔓'
+                },
+                3: {
+                    title: 'LEVEL 3 COMPLETE!',
+                    message: 'Completed the Intertech Internship chapter — Software Engineer unlocked!<br><div class="flex flex-wrap gap-2 justify-center mt-4 mb-2 font-sans">' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">💼 Intertech Internship</span>' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">🏢 QNB Internship</span>' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">🤖 Agentic AI</span>' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">💻 Backend &amp; API</span>' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">🗄️ DB / SQL</span></div>🚀 All three stages completed!',
+                    button: 'COMPLETE JOURNEY 🏆'
+                }
+            } : {
                 1: {
                     title: 'LEVEL 1 TAMAMLANDI!',
-                    message: 'Türkiye 457.si oldun! YKS canavarını 97.99 puanla yendin.<br><div class="flex flex-wrap gap-2 justify-center mt-4 mb-2 font-sans">' +
-                        '<span class="px-3 py-1 bg-green-900/60 border border-green-400 rounded text-xs md:text-sm">🎓 97,94/100 Ortalama</span>' +
+                    message: 'Türkiye 457.\'si oldun! YKS canavarını 97.92 puanla yendin.<br><div class="flex flex-wrap gap-2 justify-center mt-4 mb-2 font-sans">' +
+                        '<span class="px-3 py-1 bg-green-900/60 border border-green-400 rounded text-xs md:text-sm">🎓 97,92/100 Ortalama</span>' +
                         '<span class="px-3 py-1 bg-green-900/60 border border-green-400 rounded text-xs md:text-sm">🏫 Eskişehir Fatih Fen Lisesi</span>' +
                         '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">💪 Emek</span>' +
                         '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">📏 Disiplin</span></div>🏆 İlk kariyer rozeti kazanıldı. Şimdi İTÜ kapıları açılıyor!',
@@ -515,15 +608,16 @@
                     message: 'İTÜ Bilgisayar Mühendisliği macerasını tamamladın!<br><div class="flex flex-wrap gap-2 justify-center mt-4 mb-2 font-sans">' +
                         '<span class="px-3 py-1 bg-green-900/60 border border-green-400 rounded text-xs md:text-sm">💻 C / C++ / Python</span>' +
                         '<span class="px-3 py-1 bg-green-900/60 border border-green-400 rounded text-xs md:text-sm">🧮 Algoritma</span>' +
-                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">🏢 BİDB Stajı</span></div>🎓 İkinci rozetin hazır. Intertech seviyesi artık açıldı!',
-                    button: 'INTERTECH SEVİYESİNİ AÇ 🔓'
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">🏢 BİDB Stajı</span></div>🎓 İkinci rozetin hazır. Intertech Stajı seviyesi artık açıldı!',
+                    button: 'INTERTECH STAJINI AÇ 🔓'
                 },
                 3: {
                     title: 'LEVEL 3 TAMAMLANDI!',
-                    message: 'Intertech deneyimini tamamladın, artık Software Engineer!<br><div class="flex flex-wrap gap-2 justify-center mt-4 mb-2 font-sans">' +
+                    message: 'Intertech Stajı deneyimini tamamladın, artık Software Engineer!<br><div class="flex flex-wrap gap-2 justify-center mt-4 mb-2 font-sans">' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">💼 Intertech Stajı</span>' +
                         '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">🏢 QNB Stajı</span>' +
                         '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">🤖 Agentic AI</span>' +
-                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">📚 RAG</span>' +
+                        '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">💻 API &amp; Sistem</span>' +
                         '<span class="px-3 py-1 bg-purple-900/60 border border-purple-400 rounded text-xs md:text-sm">🗄️ DB / SQL</span></div>🚀 Üç seviyenin tamamını bitirdin!',
                     button: 'KARİYERİ TAMAMLA 🏆'
                 }
@@ -537,11 +631,14 @@
         function takeDamage() {
             if (invincibilityTimer > 0) return; 
             playerHp--;
-            invincibilityTimer = 60; 
+            invincibilityTimer = 38; 
             player.vy = -6; 
+            player.coyoteTimer = 0;
+            spawnParticles(player.x + player.w / 2, player.y + player.h / 2, 10, 'hit');
             updateHUD();
 
             if (playerHp <= 0) {
+                lastFrameTime = 0;
                 gameState = 'GAME_OVER';
                 gameOverUI.classList.remove('hidden');
             }
@@ -549,75 +646,88 @@
 
         function initGame() {
             gameDistance = 0;
-            player.y = 0;
+            player.y = groundY > player.h ? groundY - player.h : 0;
             player.vy = 0;
+            player.grounded = true;
+            player.jumpsRemaining = 2;
+            player.coyoteTimer = 6;
+            player.jumpBufferTimer = 0;
             playerHp = 3;
             playerScore = 0;
-            gameSpeed = 5.6;
+            gameSpeed = 3.1;
             currentLevel = 1;
             completedLevels = 0;
             celebrationLevel = 0;
-            updateLevelLocks();
             invincibilityTimer = 0;
+            speedBoostTimer = 0;
+            speedHold = 1;
+            endlessMode = false;
+            lastFrameTime = 0;
+            lastHudKey = '';
+            for (let i = 0; i < particles.length; i++) particles[i].active = false;
+            updateLevelLocks();
             updateHUD();
             
             boss.active = true;
             boss.hp = 2;
+            boss.hurtTimer = 0;
             boss.xOffset = 5200;
             floatingTexts = [];
             gameOverUI.classList.add('hidden');
             levelCelebrationUI.classList.add('hidden');
             document.getElementById('canvas-container').style.filter = 'none';
             
-            // Engeller — Lise: 4 engel (zaman/stres odaklı) · Üniversite: Vize/Final
+            // Engeller — Tüm 3 seviyede dengeli boşluklarla (550–850px)
             obstacles = [
-                { x: 1200, yOffset: 0, w: 70, h: 84, label: "Zaman Baskısı" },
-                { x: 1900, yOffset: 0, w: 70, h: 84, label: "Sınav Stresi" },
-                { x: 2700, yOffset: 0, w: 70, h: 84, label: "Geç Kalma" },
-                { x: 3600, yOffset: 0, w: 70, h: 84, label: "Kaygı" },
-                { x: 7000, yOffset: 0, w: 84, h: 98, label: "Vize", type: "uni" },
-                { x: 8000, yOffset: 0, w: 84, h: 98, label: "Final", type: "uni" },
-                { x: 4500, yOffset: 0, w: 50, h: 44, label: "Kuş", type: "bird" },
-                { x: 6900, yOffset: 0, w: 50, h: 44, label: "Kuş", type: "bird" },
-                { x: 10400, yOffset: 0, w: 50, h: 44, label: "Kuş", type: "bird" }
+                { x: 1150, yOffset: 0, w: 70, h: 80, label: "Zaman Baskısı" },
+                { x: 1950, yOffset: 0, w: 70, h: 80, label: "Sınav Stresi" },
+                { x: 2800, yOffset: 0, w: 70, h: 80, label: "Geç Kalma" },
+                { x: 3650, yOffset: 0, w: 70, h: 84, label: "Kaygı" },
+                { x: 4450, yOffset: 24, w: 52, h: 44, label: "Kuş", type: "bird" },
+                { x: 6850, yOffset: 0, w: 76, h: 86, label: "Vize", type: "uni" },
+                { x: 7500, yOffset: 24, w: 52, h: 44, label: "Kuş", type: "bird" },
+                { x: 8150, yOffset: 0, w: 76, h: 86, label: "Algoritma", type: "uni" },
+                { x: 8850, yOffset: 0, w: 78, h: 86, label: "Final", type: "uni" },
+                { x: 10450, yOffset: 0, w: 74, h: 82, label: "Bug", type: "uni" },
+                { x: 11150, yOffset: 0, w: 74, h: 82, label: "Latency", type: "uni" },
+                { x: 11800, yOffset: 24, w: 52, h: 44, label: "Kuş", type: "bird" },
+                { x: 12300, yOffset: 0, w: 76, h: 84, label: "Prod Deploy", type: "uni" }
             ];
 
             // Eşyalar (Q-Block / Coin / İksir(Potion))
             items = [
-                // Lise - 3 Coin: Çaba + Emek + Disiplin = 97.99 YKS puanı
-                { x: 900, yOffset: 130, w: 56, h: 48, label: "Çaba (+32.99)", val: 32.99, type: "tech", logo: "book" },
-                { x: 2300, yOffset: 130, w: 56, h: 48, label: "Emek (+32.5)", val: 32.5, type: "tech", logo: "book" },
-                { x: 3300, yOffset: 130, w: 56, h: 48, label: "Disiplin (+32.5)", val: 32.5, type: "tech", logo: "book" },
-                // Hız iksiri (çiçek) - YKS öncesi bonus
-                { x: 1600, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 3900, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 5200, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 7200, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 8300, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 9200, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 10500, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 11900, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
+                // Lise - 3 Kitap: Çaba + Emek + Disiplin = 97.92 ortalama
+                { x: 900, yOffset: 130, w: 56, h: 48, label: "Çaba (+32.92)", val: 32.92, type: "tech", logo: "book" },
+                { x: 2350, yOffset: 130, w: 56, h: 48, label: "Emek (+32.5)", val: 32.5, type: "tech", logo: "book" },
+                { x: 3250, yOffset: 130, w: 56, h: 48, label: "Disiplin (+32.5)", val: 32.5, type: "tech", logo: "book" },
+                // Hız iksiri (çiçek) - yumuşak +1.45x tempo
+                { x: 1550, yOffset: 10, w: 40, h: 40, label: "Hız +1.5x!", val: 5, type: "flower" },
+                { x: 4100, yOffset: 10, w: 40, h: 40, label: "Hız +1.5x!", val: 5, type: "flower" },
+                { x: 7180, yOffset: 10, w: 40, h: 40, label: "Hız +1.5x!", val: 5, type: "flower" },
+                { x: 8500, yOffset: 10, w: 40, h: 40, label: "Hız +1.5x!", val: 5, type: "flower" },
+                { x: 10920, yOffset: 10, w: 40, h: 40, label: "Hız +1.5x!", val: 5, type: "flower" },
+                { x: 12050, yOffset: 10, w: 40, h: 40, label: "Hız +1.5x!", val: 5, type: "flower" },
 
                 // YKS Sonrası Kupa
                 { x: 5900, yOffset: 80, w: 98, h: 126, label: "TR 457.", val: 100, type: "trophy" },
 
                 // İTÜ Bilgisayar Mühendisliği - CV becerileri + BİDB stajı
-                { x: 6900, yOffset: 120, w: 56, h: 56, label: "C", val: 15, type: "qblock" },
-                { x: 7400, yOffset: 130, w: 60, h: 60, label: "C++", val: 15, type: "tech", logo: "cpp" },
-                { x: 7900, yOffset: 140, w: 42, h: 56, label: "Algoritma", val: 15, type: "coin" },
-                { x: 8400, yOffset: 130, w: 60, h: 60, label: "Python", val: 15, type: "tech", logo: "python" },
-                { x: 8900, yOffset: 140, w: 56, h: 72, label: "BİDB Stajı", val: 30, type: "potion" },
+                { x: 6520, yOffset: 125, w: 56, h: 56, label: "C", val: 15, type: "qblock" },
+                { x: 7820, yOffset: 130, w: 60, h: 60, label: "C++", val: 15, type: "tech", logo: "cpp" },
+                { x: 8480, yOffset: 135, w: 42, h: 56, label: "Veri Yapıları", val: 15, type: "coin" },
+                { x: 8620, yOffset: 130, w: 60, h: 60, label: "Python", val: 15, type: "tech", logo: "python" },
+                { x: 9180, yOffset: 135, w: 56, h: 72, label: "BİDB Stajı", val: 30, type: "potion" },
                 // Level 2 bitiş ödülü: İTÜ diploması
-                { x: 9500, yOffset: 80, w: 98, h: 126, label: "İTÜ DİPLOMASI", val: 150, type: "trophy" },
+                { x: 9550, yOffset: 80, w: 98, h: 126, label: "İTÜ DİPLOMASI", val: 150, type: "trophy" },
 
-                // Level 3 - Intertech dönemi: büyük iksirler + skiller
-                { x: 10100, yOffset: 140, w: 56, h: 72, label: "QNB Stajı", val: 40, type: "potion" },
-                { x: 10600, yOffset: 140, w: 56, h: 72, label: "Agentic AI", val: 25, type: "potion" },
-                { x: 11100, yOffset: 140, w: 56, h: 72, label: "RAG", val: 25, type: "potion" },
-                { x: 11600, yOffset: 130, w: 70, h: 60, label: "DB / SQL", val: 25, type: "tech", logo: "sql" },
-                { x: 12100, yOffset: 140, w: 72, h: 90, label: "Intertech Stajı", val: 60, type: "potion" },
+                // Level 3 - Intertech Stajı dönemi: büyük iksirler + skiller
+                { x: 10120, yOffset: 135, w: 56, h: 72, label: "QNB Stajı", val: 40, type: "potion" },
+                { x: 10760, yOffset: 135, w: 56, h: 72, label: "Agentic AI", val: 25, type: "potion" },
+                { x: 11450, yOffset: 135, w: 56, h: 72, label: "API & Sistem", val: 25, type: "potion" },
+                { x: 11640, yOffset: 130, w: 70, h: 60, label: "DB / SQL", val: 25, type: "tech", logo: "sql" },
+                { x: 12050, yOffset: 135, w: 72, h: 90, label: "Intertech Stajı", val: 60, type: "potion" },
                 // Level 3 bitiş ödülü: ilk profesyonel kariyer başarısı
-                { x: 12600, yOffset: 80, w: 98, h: 126, label: "SOFTWARE ENGINEER", val: 250, type: "trophy" }
+                { x: 12700, yOffset: 80, w: 98, h: 126, label: "SOFTWARE ENGINEER", val: 250, type: "trophy" }
             ];
 
             // Dekoratif Tuğlalar ve Kaktüsleri Oluştur
@@ -663,8 +773,8 @@
 
         // --- PİXEL ART ÇİZİM FONKSİYONLARI ---
 
-        function drawPlayer(ctx) {
-            if (invincibilityTimer > 0 && Math.floor(Date.now() / 100) % 2 === 0) return; 
+        function drawPlayer(ctx, now) {
+            if (invincibilityTimer > 0 && Math.floor(now / 90) % 2 === 0) return; 
 
             // Gerçek koşan karakter görseli (kullanıcı tarafından sağlandı)
             if (ASSET_RUNNER.complete && ASSET_RUNNER.naturalWidth > 0) {
@@ -686,7 +796,7 @@
             ctx.fillRect(player.x + 14, player.y, player.w - 28, player.h);
         }
 
-        function drawBackgrounds(ctx) {
+        function drawBackgrounds(ctx, now) {
             const level = gameDistance >= 9800 ? 3 : (gameDistance >= 6200 ? 2 : 1);
 
             // Ortak gökyüzü + şehir silüeti (TÜM levellerde aynı arka plan görseli)
@@ -717,10 +827,10 @@
 
             // Uçan Kuş (tüm levellerde, gerçek görsel)
             let birdX = ((canvas.width + 200) - (gameDistance * 0.8) % (canvas.width + 1000));
-            let birdY = 80 + Math.sin(Date.now()/300)*20;
+            let birdY = 80 + Math.sin(now/300)*20;
             if (ASSET_BIRD_SKY.complete && ASSET_BIRD_SKY.naturalWidth > 0) {
                 const bw = 70, bh = bw * (ASSET_BIRD_SKY.naturalHeight / ASSET_BIRD_SKY.naturalWidth);
-                const flap = Math.sin(Date.now()/150) * 0.08;
+                const flap = Math.sin(now/150) * 0.08;
                 ctx.save();
                 ctx.translate(birdX + bw/2, birdY + bh/2);
                 ctx.rotate(flap);
@@ -761,7 +871,7 @@
             }
         }
 
-        function drawEntities(ctx) {
+        function drawEntities(ctx, now) {
             // Karakterin zemine bastığını hissettiren piksel gölgesi
             ctx.fillStyle = 'rgba(15, 23, 42, 0.28)';
             ctx.beginPath();
@@ -780,22 +890,20 @@
                     } else if (dec.type === 'tree') {
                         if (ASSET_TREE.complete && ASSET_TREE.naturalWidth > 0) {
                             const th = 150, tw = th * (ASSET_TREE.naturalWidth / ASSET_TREE.naturalHeight);
-                            ctx.save();
-                            ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 4;
+                            ctx.fillStyle = 'rgba(10, 10, 20, 0.22)';
+                            ctx.beginPath();
+                            ctx.ellipse(dx + tw * 0.5, groundY - 2, tw * 0.36, 7, 0, 0, Math.PI * 2);
+                            ctx.fill();
                             ctx.drawImage(ASSET_TREE, dx, groundY - th + 6, tw, th);
-                            ctx.restore();
                         }
                     } else if (dec.type === 'brick') {
                         let by = groundY - dec.h - dec.yOffset;
-                        ctx.save();
-                        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                        ctx.shadowBlur = 8;
-                        ctx.shadowOffsetY = 3;
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+                        ctx.fillRect(dx + 4, by + 4, dec.w, dec.h);
                         ctx.fillStyle = '#cb4154'; ctx.fillRect(dx, by, dec.w, dec.h);
                         ctx.fillStyle = '#000'; ctx.fillRect(dx, by, dec.w, 2); ctx.fillRect(dx, by+dec.h-2, dec.w, 2);
                         ctx.fillRect(dx, by, 2, dec.h); ctx.fillRect(dx+dec.w-2, by, 2, dec.h);
                         ctx.fillRect(dx, by+dec.h/2, dec.w, 2); ctx.fillRect(dx+dec.w/2, by, 2, dec.h/2);
-                        ctx.restore();
                     }
                 }
             });
@@ -804,7 +912,11 @@
             if (boss.active && gameDistance > 3500 && gameDistance < 6000) {
                 let bx = boss.xOffset - gameDistance;
                 let by = groundY - boss.h;
-                ctx.globalAlpha = boss.hurtTimer > 0 && (Math.floor(Date.now()/50)%2===0) ? 0.5 : 1;
+                ctx.fillStyle = 'rgba(10, 10, 20, 0.32)';
+                ctx.beginPath();
+                ctx.ellipse(bx + boss.w / 2, groundY - 3, boss.w * 0.52, 9, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = boss.hurtTimer > 0 && (Math.floor(now/50)%2===0) ? 0.5 : 1;
                 if (ASSET_SLIME.complete && ASSET_SLIME.naturalWidth > 0) {
                     const aspect = ASSET_SLIME.naturalWidth / ASSET_SLIME.naturalHeight;
                     const dh = boss.h + 20;
@@ -820,7 +932,7 @@
                     ctx.fillStyle = boss.hp === 1 ? '#ff1744' : '#b71c1c';
                     ctx.fillRect(bx, by, boss.w, boss.h);
                 }
-                drawTextBg(ctx, "YKS", bx+45, by-30, 16, '#39ff14');
+                drawTextBg(ctx, boss.hp === 1 ? "YKS (1 HP)" : "YKS", bx+35, by-30, 15, '#39ff14');
                 ctx.globalAlpha = 1;
             }
 
@@ -830,12 +942,13 @@
                 let ox = obs.x - gameDistance;
                 let oy = groundY - obs.h - obs.yOffset;
                 if (ox < canvas.width && ox > -100) {
-                    ctx.save();
-                    ctx.shadowColor = 'rgba(0,0,0,0.55)';
-                    ctx.shadowBlur = 10;
-                    ctx.shadowOffsetY = 4;
+                    ctx.fillStyle = 'rgba(10, 10, 20, 0.28)';
+                    ctx.beginPath();
+                    ctx.ellipse(ox + obs.w / 2, groundY - 3, obs.w * 0.52, 7, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
                     if (obs.type === "bird") {
-                        let waddle = Math.sin(Date.now()/120) * 4;
+                        let waddle = Math.sin(now/120) * 4;
                         let by2 = oy + waddle;
                         ctx.fillStyle = '#fff';
                         ctx.beginPath(); ctx.ellipse(ox+obs.w*0.45, by2+obs.h*0.55, obs.w*0.4, obs.h*0.4, 0, 0, Math.PI*2); ctx.fill();
@@ -845,10 +958,10 @@
                         ctx.fillRect(ox+obs.w*0.35, by2+obs.h*0.9, 6, 10); ctx.fillRect(ox+obs.w*0.55, by2+obs.h*0.9, 6, 10);
                         ctx.fillStyle = '#000'; ctx.fillRect(ox+obs.w*0.75, by2+obs.h*0.18, 4, 4);
                     } else if(obs.type === "uni") {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)'; ctx.fillRect(ox+4, oy+4, obs.w, obs.h);
                         ctx.fillStyle = '#742a2a'; ctx.fillRect(ox, oy, obs.w, obs.h);
                         ctx.fillStyle = '#000'; ctx.fillRect(ox+15, oy+15, 15, 15); ctx.fillRect(ox+40, oy+15, 15, 15);
                     } else {
-                        // Çit (sınav kaygısı / stres engelleri) - orijinal piksel çizim
                         const pw = obs.w*0.12;
                         ctx.fillStyle = '#9c2a1e';
                         ctx.fillRect(ox, oy, pw, obs.h);
@@ -868,7 +981,6 @@
                         ctx.strokeRect(ox, oy, pw, obs.h);
                         ctx.strokeRect(ox+obs.w-pw, oy, pw, obs.h);
                     }
-                    ctx.restore();
                     drawTextBg(ctx, obs.label, ox-10, oy-15, 11, '#fc8181');
                 }
             });
@@ -880,28 +992,19 @@
                 let iy = groundY - item.h - item.yOffset;
                 
                 if (ix < canvas.width && ix > -100) {
-                    // Zemin gölgesi: eşyayı gerçekçi fon üstünde "yapıştırma" hissinden kurtarır
-                    ctx.save();
-                    ctx.fillStyle = 'rgba(10, 10, 20, 0.3)';
+                    ctx.fillStyle = 'rgba(10, 10, 20, 0.28)';
                     ctx.beginPath();
                     ctx.ellipse(ix + item.w/2, groundY - 4, item.w * 0.55, 8, 0, 0, Math.PI*2);
                     ctx.fill();
-                    // Parıltı halesi sadece blok/coin/potion/kupa gibi çizim-tabanlı eşyalarda (resim ikonlarında değil, arka plan kutusu gibi görünmesin diye)
                     if (item.type !== "tech" && item.type !== "flower") {
-                        const glow = ctx.createRadialGradient(ix+item.w/2, iy+item.h/2, 2, ix+item.w/2, iy+item.h/2, item.w*0.9);
-                        glow.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
-                        glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                        ctx.fillStyle = glow;
-                        ctx.fillRect(ix - item.w*0.4, iy - item.h*0.4, item.w*1.8, item.h*1.8);
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
+                        ctx.beginPath();
+                        ctx.arc(ix+item.w/2, iy+item.h/2, item.w*0.68, 0, Math.PI*2);
+                        ctx.fill();
                     }
-                    ctx.restore();
-
-                    ctx.save();
-                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                    ctx.shadowBlur = 10;
-                    ctx.shadowOffsetY = 4;
 
                     if (item.type === "qblock") {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)'; ctx.fillRect(ix+4, iy+4, item.w, item.h);
                         ctx.fillStyle = '#f6ad55'; ctx.fillRect(ix, iy, item.w, item.h); 
                         ctx.strokeStyle = '#fff3b0'; ctx.lineWidth = 3; ctx.strokeRect(ix + 2, iy + 2, item.w - 4, item.h - 4);
                         ctx.fillStyle = '#c05621'; ctx.fillRect(ix, iy+item.h-4, item.w, 4); ctx.fillRect(ix+item.w-4, iy, 4, item.h);
@@ -909,15 +1012,15 @@
                         ctx.fillStyle = '#fff'; ctx.font = '32px "Press Start 2P"'; ctx.fillText('?', ix + item.w / 2 - 10, iy + 42);
                     } 
                     else if (item.type === "coin") {
-                        let anim = Math.sin(Date.now() / 150); 
-                        let width = item.w * Math.abs(anim);
+                        let anim = Math.sin(now / 150); 
+                        let width = Math.max(4, item.w * Math.abs(anim));
                         ctx.fillStyle = '#f6e05e';
                         ctx.beginPath(); ctx.ellipse(ix + item.w/2, iy + item.h/2, width/2, item.h/2, 0, 0, Math.PI*2); ctx.fill();
                         ctx.strokeStyle = '#b7791f'; ctx.lineWidth = 3; ctx.stroke();
                         if(Math.abs(anim) > 0.3) { ctx.fillStyle = '#fff'; ctx.fillRect(ix + item.w/2 - 2, iy + 10, 4, item.h-20); }
                     }
                     else if (item.type === "potion") {
-                        let bob = Math.sin(Date.now()/200) * 5;
+                        let bob = Math.sin(now/200) * 5;
                         let py = iy + bob;
                         ctx.fillStyle = '#b026ff';
                         ctx.fillRect(ix + item.w*0.32, py, item.w*0.36, item.h*0.22);
@@ -935,7 +1038,7 @@
                     }
                     else if (item.type === "tech") {
                         const logoImg = TECH_LOGOS[item.logo];
-                        let bob = Math.sin(Date.now()/220) * 5;
+                        let bob = Math.sin(now/220) * 5;
                         if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
                             ctx.drawImage(logoImg, ix, iy + bob, item.w, item.h);
                         } else {
@@ -943,10 +1046,8 @@
                         }
                     }
                     else if (item.type === "flower") {
-                        let bob = Math.sin(Date.now()/180) * 4;
+                        let bob = Math.sin(now/180) * 4;
                         let fy = iy + bob;
-                        ctx.save();
-                        ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 6;
                         ctx.fillStyle = '#2f855a';
                         ctx.fillRect(ix + item.w*0.42, fy + item.h*0.35, item.w*0.16, item.h*0.65);
                         ctx.fillStyle = '#38a169';
@@ -956,10 +1057,9 @@
                         ctx.beginPath(); ctx.arc(ix + item.w*0.5, fy + item.h*0.28, item.w*0.28, 0, Math.PI*2); ctx.fill();
                         ctx.fillStyle = '#fc8181';
                         ctx.beginPath(); ctx.arc(ix + item.w*0.4, fy + item.h*0.2, item.w*0.1, 0, Math.PI*2); ctx.fill();
-                        ctx.restore();
                     }
                     else if (item.type === "trophy") {
-                        iy += Math.sin(Date.now()/150)*10; // Kupa süzülsün
+                        iy += Math.sin(now/150)*10;
                         ctx.fillStyle = '#ffd700'; ctx.fillRect(ix+10, iy, item.w-20, item.h/2); 
                         ctx.beginPath(); ctx.arc(ix+item.w/2, iy+item.h/2, item.w/2-10, 0, Math.PI); ctx.fill();
                         ctx.fillRect(ix+item.w/2-10, iy+item.h/2+10, 20, item.h/3); 
@@ -968,93 +1068,155 @@
                         ctx.beginPath(); ctx.arc(ix+5, iy+25, 20, Math.PI/2, Math.PI*1.5); ctx.stroke();
                         ctx.beginPath(); ctx.arc(ix+item.w-5, iy+25, 20, -Math.PI/2, Math.PI/2); ctx.stroke();
                     }
-                    ctx.restore();
-                    // Eşya üstü açıklama etiketi
                     if(item.type !== "trophy") drawTextBg(ctx, item.label, ix - 10, iy - 20, 11, '#fff'); 
                 }
             });
         }
 
         // --- GÜNCELLEME DÖNGÜSÜ ---
-        function update() {
+        function update(dt) {
             if (gameState !== 'PLAYING') return;
 
-            if (invincibilityTimer > 0) invincibilityTimer--;
-            if (speedBoostTimer > 0) speedBoostTimer--;
+            if (invincibilityTimer > 0) invincibilityTimer = Math.max(0, invincibilityTimer - dt);
+            if (speedBoostTimer > 0) speedBoostTimer = Math.max(0, speedBoostTimer - dt);
+            if (boss.hurtTimer > 0) boss.hurtTimer = Math.max(0, boss.hurtTimer - dt);
+            if (player.coyoteTimer > 0) player.coyoteTimer = Math.max(0, player.coyoteTimer - dt);
+            if (player.jumpBufferTimer > 0) player.jumpBufferTimer = Math.max(0, player.jumpBufferTimer - dt);
 
-            player.vy += player.gravity;
-            player.y += player.vy;
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                floatingTexts[i].life -= dt;
+                if (floatingTexts[i].life <= 0) floatingTexts.splice(i, 1);
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                if (!p.active) continue;
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                p.vy += p.gravity * dt;
+                p.life -= dt;
+                if (p.life <= 0) p.active = false;
+            }
+
+            const wasGrounded = player.grounded;
+            player.vy += player.gravity * dt;
+            player.y += player.vy * dt;
 
             if (player.y + player.h >= groundY) {
                 player.y = groundY - player.h;
                 player.vy = 0;
                 player.grounded = true;
+                player.jumpsRemaining = 2;
+                player.coyoteTimer = 6;
+                if (!wasGrounded) {
+                    spawnParticles(player.x + player.w / 2, groundY - 2, 6, 'dust');
+                }
             } else {
                 player.grounded = false;
             }
 
-            gameDistance += gameSpeed * (speedBoostTimer > 0 ? 3 : 1) * speedHold;
+            if (player.jumpBufferTimer > 0) {
+                if (player.grounded || player.coyoteTimer > 0) {
+                    player.vy = player.jumpPower;
+                    player.grounded = false;
+                    player.coyoteTimer = 0;
+                    player.jumpBufferTimer = 0;
+                    player.jumpsRemaining = 1;
+                    spawnParticles(player.x + player.w / 2, groundY - 4, 7, 'dust');
+                } else if (player.jumpsRemaining > 0) {
+                    player.vy = player.jumpPower * 0.86;
+                    player.jumpsRemaining = 0;
+                    player.jumpBufferTimer = 0;
+                    spawnParticles(player.x + player.w / 2, player.y + player.h - 4, 9, 'sparkle');
+                }
+            }
 
-            // Boss Çarpışması
+            const speedMultiplier = (speedBoostTimer > 0 ? 1.45 : 1) * speedHold;
+            gameDistance += gameSpeed * speedMultiplier * dt;
+
+            // Boss Çarpışması & Anti-AFK Duvarı
             if (boss.active && gameDistance > 3500) {
                 let bx = boss.xOffset - gameDistance;
                 let by = groundY - boss.h;
                 
-                if (bx + 25 < player.x + player.w && bx + boss.w - 25 > player.x && player.y + player.h > by + 25 && player.y < by + boss.h) {
-                    if (player.vy > 0 && player.y + player.h < by + 70) {
-                        player.vy = -16;
-                        boss.hurtTimer = 10;
-                        if (playerScore >= 97.99) {
+                if (bx + 20 < player.x + player.w && bx + boss.w - 20 > player.x && player.y + player.h > by + 20 && player.y < by + boss.h) {
+                    if (player.vy > 0 && player.y + player.h < by + 80) {
+                        player.vy = -16.5;
+                        player.jumpsRemaining = 1;
+                        boss.hurtTimer = 18;
+                        spawnParticles(bx + boss.w / 2, by + 20, 12, 'hit');
+                        if (playerScore + 1e-6 >= 97.92) {
                             boss.hp = 0;
                             boss.active = false;
-                            spawnText("97.99 PUAN!", bx+10, by-45, '#ffd700');
+                            spawnText("97.92 PUAN!", bx+10, by-45, '#ffd700');
                             spawnText("YKS YENİLDİ!", bx, by-70, '#39ff14');
                             updateHUD();
+                        } else if (boss.hp > 1) {
+                            boss.hp--;
+                            playerScore += 15;
+                            gameDistance = Math.max(0, gameDistance - 120);
+                            spawnText("YKS HASAR! +15", bx-20, by-35, '#ffeb3b');
+                            updateHUD();
                         } else {
-                            spawnText("YETERSİZ PUAN " + playerScore.toFixed(2) + "/97.99", bx-60, by-20, '#ff0');
+                            boss.hp = 0;
+                            boss.active = false;
+                            playerScore += 15;
+                            spawnText("YKS YENİLDİ!", bx, by-65, '#39ff14');
+                            updateHUD();
                         }
                     } else {
-                        spawnText("HASAR!", player.x, player.y, '#f00');
+                        spawnText("HASAR!", player.x, player.y-10, '#f00');
                         takeDamage();
+                        gameDistance = Math.max(0, gameDistance - 240);
+                    }
+                }
+
+                if (boss.active) {
+                    const bossWallDist = boss.xOffset - player.x;
+                    if (gameDistance > bossWallDist) {
+                        gameDistance = bossWallDist;
                     }
                 }
             }
 
-            // Engeller
+            // Engeller (adil kenar boşluğu: 12px yatay, 8px üst)
             obstacles.forEach(obs => {
                 if(obs.cleared) return;
                 let ox = obs.x - gameDistance;
                 let oy = groundY - obs.h - obs.yOffset;
-                if (player.x + 15 < ox + obs.w && player.x + player.w - 15 > ox && player.y + player.h > oy + 15 && player.y < oy + obs.h) {
+                if (player.x + 12 < ox + obs.w - 12 && player.x + player.w - 12 > ox + 12 && player.y + player.h > oy + 8 && player.y + 8 < oy + obs.h) {
                     obs.cleared = true; 
                     spawnText("ENGEL!", player.x, player.y-20, '#f00');
                     takeDamage();
                 }
             });
 
-            // İtemler
+            // İtemler (+10px cömert toplama alanı)
             items.forEach(item => {
                 if(item.collected) return;
                 let ix = item.x - gameDistance;
                 let iy = groundY - item.h - item.yOffset;
-                if (player.x < ix + item.w && player.x + player.w > ix && player.y + player.h > iy && player.y < iy + item.h) {
+                if (player.x - 10 < ix + item.w && player.x + player.w + 10 > ix && player.y + player.h + 10 > iy && player.y - 10 < iy + item.h) {
                     item.collected = true;
                     
                     if (item.type === 'flower') {
-                        speedBoostTimer = 180;
-                        spawnText("HIZ +3x!", player.x, player.y-30, '#ff69b4');
+                        speedBoostTimer = 200;
+                        spawnText("Hız +1.5x!", player.x, player.y-30, '#ff69b4');
+                        spawnParticles(ix + item.w / 2, iy + item.h / 2, 8, 'sparkle');
                     } else if(item.type === 'trophy') {
                         completedLevels = Math.max(completedLevels, currentLevel);
                         const rewardText = currentLevel === 1 ? "TÜRKİYE 457.Sİ!" : (currentLevel === 2 ? "İTÜ DİPLOMASI!" : "SOFTWARE ENGINEER!");
                         spawnText(rewardText, player.x-40, player.y-40, '#ffd700');
+                        spawnParticles(ix + item.w / 2, iy + item.h / 2, 16, 'sparkle');
                         updateLevelLocks();
-                        // Checkpoint: ölünce buradan (bir sonraki levelin başından) devam edilecek
                         checkpointDistance = currentLevel === 1 ? 6200 : (currentLevel === 2 ? 9800 : gameDistance);
                         checkpointScore = playerScore + item.val;
+                        lastFrameTime = 0;
                         gameState = 'CELEBRATION';
                         showLevelCelebration(currentLevel);
                     } else {
                         spawnText("+ " + item.label, player.x, player.y-30, '#39ff14');
+                        spawnParticles(ix + item.w / 2, iy + item.h / 2, 8, 'sparkle');
                     }
                     
                     playerScore += item.val;
@@ -1067,36 +1229,81 @@
             });
 
             if (!endlessMode && gameDistance > 13200 && completedLevels < 3) {
-                // Son ödül alınmadan final ekranı açılmaz; oyuncu kupaya ulaşmaya devam eder.
                 gameDistance = 13180;
             }
 
-            if (endlessMode) spawnEndlessContent();
+            if (endlessMode) {
+                spawnEndlessContent();
+            } else {
+                updateHUD();
+            }
+        }
+
+        function drawPausedOverlay() {
+            ctx.save();
+            ctx.fillStyle = 'rgba(15, 17, 21, 0.56)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const isEn = currentLang === 'en';
+            const heading = isEn ? 'PAUSED' : 'DURAKLATILDI';
+            const sub = isEn ? 'Press [P] to continue' : 'Devam etmek için [P] tuşuna bas';
+
+            ctx.textAlign = 'center';
+            ctx.font = '32px "Press Start 2P"';
+            ctx.fillStyle = '#000';
+            ctx.fillText(heading, canvas.width / 2 + 3, canvas.height / 2 - 12);
+            ctx.fillStyle = '#39ff14';
+            ctx.fillText(heading, canvas.width / 2, canvas.height / 2 - 15);
+
+            ctx.font = '14px "Inter", sans-serif';
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillText(sub, canvas.width / 2, canvas.height / 2 + 28);
+            ctx.restore();
         }
 
         function draw() {
+            const now = performance.now();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            drawBackgrounds(ctx);
-            drawEntities(ctx);
+            drawBackgrounds(ctx, now);
+            drawEntities(ctx, now);
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                if (!p.active) continue;
+                ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+            }
+            ctx.globalAlpha = 1;
+
             if (gameState !== 'END_HIRE_ME') {
-                drawPlayer(ctx);
+                drawPlayer(ctx, now);
             }
 
             for (let i = floatingTexts.length - 1; i >= 0; i--) {
                 let ft = floatingTexts[i];
-                ctx.globalAlpha = ft.life / 40;
+                ctx.globalAlpha = Math.max(0, ft.life / 40);
                 drawTextBg(ctx, ft.text, ft.x, ft.y - (40 - ft.life), 12, ft.color);
-                ft.life--;
-                if (ft.life <= 0) floatingTexts.splice(i, 1);
             }
             ctx.globalAlpha = 1;
+
+            if (gameState === 'PAUSED') {
+                drawPausedOverlay();
+            }
         }
 
-        function loop() {
+        function loop(timestamp) {
             try {
-                if (gameState === 'PLAYING') update();
-                if (gameState === 'PLAYING' || gameState === 'START' || gameState === 'CELEBRATION') draw();
+                if (gameState === 'PLAYING') {
+                    const ts = typeof timestamp === 'number' ? timestamp : performance.now();
+                    const dt = lastFrameTime ? Math.min((ts - lastFrameTime) / (1000 / 60), 2.5) : 1;
+                    lastFrameTime = ts;
+                    update(dt);
+                } else {
+                    lastFrameTime = 0;
+                }
+                if (gameState === 'PLAYING' || gameState === 'START' || gameState === 'CELEBRATION' || gameState === 'PAUSED') draw();
             } catch (e) {
                 console.error('Oyun döngüsü hatası (yakalandı, oyun durmadı):', e);
             }
@@ -1104,25 +1311,69 @@
         }
 
         function jump() {
-            if (gameState === 'PLAYING' && player.grounded) {
-                player.vy = player.jumpPower;
-                player.grounded = false;
+            if (gameState === 'PLAYING') {
+                player.jumpBufferTimer = 10;
             }
         }
 
+        function releaseJump() {
+            if (gameState === 'PLAYING' && player.vy < -6) {
+                player.vy *= 0.6;
+            }
+        }
+
+        function togglePause() {
+            if (gameState === 'PLAYING') {
+                gameState = 'PAUSED';
+                speedHold = 1;
+                lastFrameTime = 0;
+            } else if (gameState === 'PAUSED') {
+                lastFrameTime = 0;
+                gameState = 'PLAYING';
+            } else {
+                return;
+            }
+            draw();
+        }
+
         window.addEventListener('keydown', e => {
-            if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); }
-            if (e.code === 'ArrowRight' || e.key === '>' || e.key === '.') { speedHold = 1.6; e.preventDefault(); }
-            if (e.code === 'ArrowLeft' || e.key === '<' || e.key === ',') { speedHold = 0.55; e.preventDefault(); }
+            if ((e.code === 'KeyP' || e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                if (gameState === 'PLAYING' || gameState === 'PAUSED') {
+                    e.preventDefault();
+                    togglePause();
+                }
+                return;
+            }
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                e.preventDefault();
+                if (!e.repeat) jump();
+            }
+            if (e.code === 'ArrowRight' || e.key === '>' || e.key === '.') { speedHold = 1.55; e.preventDefault(); }
+            if (e.code === 'ArrowLeft' || e.key === '<' || e.key === ',') { speedHold = 0.6; e.preventDefault(); }
         });
         window.addEventListener('keyup', e => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                releaseJump();
+            }
             if (e.code === 'ArrowRight' || e.code === 'ArrowLeft' || e.key === '>' || e.key === '<' || e.key === '.' || e.key === ',') {
                 speedHold = 1;
             }
         });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                lastFrameTime = 0;
+                speedHold = 1;
+            }
+        });
         
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
-        touchLayer.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
+        canvas.addEventListener('touchstart', (e) => { if (gameState === 'PLAYING') { e.preventDefault(); jump(); } }, { passive: false });
+        canvas.addEventListener('touchend', () => releaseJump());
+        canvas.addEventListener('touchcancel', () => releaseJump());
+        canvas.addEventListener('mousedown', (e) => { if (gameState === 'PLAYING' && e.button === 0) jump(); });
+        canvas.addEventListener('mouseup', () => releaseJump());
+        touchLayer.addEventListener('touchstart', (e) => { if (gameState === 'PLAYING') { e.preventDefault(); jump(); } }, { passive: false });
+        touchLayer.addEventListener('touchend', () => releaseJump());
+        touchLayer.addEventListener('touchcancel', () => releaseJump());
 
         startRunBtn.addEventListener('click', () => {
             startUI.classList.add('hidden');
@@ -1130,6 +1381,7 @@
             checkpointDistance = 0;
             checkpointScore = 0;
             initGame();
+            lastFrameTime = 0;
             gameState = 'PLAYING';
         });
 
@@ -1138,12 +1390,26 @@
             const savedCompleted = completedLevels;
             const savedCheckDist = checkpointDistance;
             const savedCheckScore = checkpointScore;
+            const wasEndless = endlessMode;
             initGame();
-            // Ölünce en baştan değil, son tamamlanan levelin başından devam et
-            completedLevels = savedCompleted;
-            gameDistance = savedCheckDist;
-            playerScore = savedCheckScore;
+            endlessMode = false;
+            speedBoostTimer = 0;
+            invincibilityTimer = 0;
+            speedHold = 1;
+            lastFrameTime = 0;
+            if (!wasEndless && savedCompleted > 0 && savedCompleted < 3) {
+                completedLevels = savedCompleted;
+                gameDistance = savedCheckDist;
+                playerScore = savedCheckScore;
+            } else {
+                completedLevels = 0;
+                checkpointDistance = 0;
+                checkpointScore = 0;
+                gameDistance = 0;
+                playerScore = 0;
+            }
             currentLevel = gameDistance >= 9800 ? 3 : (gameDistance >= 6200 ? 2 : 1);
+            lastHudKey = '';
             updateLevelLocks();
             updateHUD();
             gameState = 'PLAYING';
@@ -1153,6 +1419,7 @@
             levelCelebrationUI.classList.add('hidden');
 
             if (celebrationLevel === 3) {
+                lastFrameTime = 0;
                 gameState = 'END_HIRE_ME';
                 hireMeModal.classList.remove('hidden');
                 document.getElementById('canvas-container').style.filter = "brightness(0.3)";
@@ -1164,6 +1431,12 @@
             player.y = groundY - player.h;
             player.vy = 0;
             player.grounded = true;
+            player.jumpsRemaining = 2;
+            player.coyoteTimer = 6;
+            player.jumpBufferTimer = 0;
+            speedHold = 1;
+            lastFrameTime = 0;
+            lastHudKey = '';
             updateHUD();
             gameState = 'PLAYING';
         });
@@ -1172,7 +1445,10 @@
             hireMeModal.classList.add('hidden');
             document.getElementById('canvas-container').style.filter = "";
             endlessMode = true;
+            lastFrameTime = 0;
+            lastHudKey = '';
             gameState = 'PLAYING';
+            updateHUD();
         });
 
         function spawnEndlessContent() {
@@ -1181,17 +1457,17 @@
                 items.length ? items[items.length-1].x : 0
             );
             if (furthestX - gameDistance < canvas.width * 1.5) {
-                const nx = furthestX + 500 + Math.random()*400;
+                const nx = furthestX + 550 + Math.random()*250;
                 if (Math.random() < 0.55) {
                     const kinds = [
-                        { w:70,h:84,label:"Zorluk" }, { w:50,h:44,label:"Kuş",type:"bird" }
+                        { w:70,h:82,yOffset:0,label:"Zorluk" }, { w:52,h:44,yOffset:24,label:"Kuş",type:"bird" }
                     ];
                     const k = kinds[Math.floor(Math.random()*kinds.length)];
-                    obstacles.push({ x: nx, yOffset: 0, w: k.w, h: k.h, label: k.label, type: k.type });
+                    obstacles.push({ x: nx, yOffset: k.yOffset, w: k.w, h: k.h, label: k.label, type: k.type });
                 } else {
                     const r = Math.random();
                     if (r < 0.3) {
-                        items.push({ x: nx, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" });
+                        items.push({ x: nx, yOffset: 10, w: 40, h: 40, label: "Hız +1.5x!", val: 5, type: "flower" });
                     } else {
                         const logos = ['book','python','sql','cpp'];
                         const lg = logos[Math.floor(Math.random()*logos.length)];
@@ -1207,6 +1483,7 @@
                 bestScore = Math.floor(playerScore);
                 localStorage.setItem('career_best_score', String(bestScore));
             }
+            updateHUD();
         }
 
         function resizeCanvas() {
@@ -1221,9 +1498,13 @@
             canvas.style.height = `${Math.floor(logicalHeight * scale)}px`;
 
             groundY = logicalHeight - 80;
-            player.y = groundY - player.h;
+            if (gameState === 'START' || player.grounded || player.y === 0) {
+                player.y = groundY - player.h;
+            }
             if (gameState === 'START') {
                 initGame();
+                draw();
+            } else if (gameState === 'PAUSED' || gameState === 'CELEBRATION') {
                 draw();
             }
         }

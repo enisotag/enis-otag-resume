@@ -68,7 +68,7 @@
     TECH_LOGOS.book = ASSET_BOOK;
         let gameState = 'START';
         let gameDistance = 0;
-        let gameSpeed = 16;
+        let gameSpeed = 3.1;
         let currentLevel = 1;
         let completedLevels = 0;
         let checkpointDistance = 0;
@@ -76,6 +76,20 @@
         let celebrationLevel = 0;
         let groundY = 0;
         let floatingTexts = [];
+        let lastFrameTime = 0;
+        let lastHudKey = '';
+        const lastHudState = { hp: '', score: '', level: '', levelName: '', pct: '', ariaPct: '', lockKey: '' };
+
+        function invalidateHudCache() {
+            lastHudKey = '';
+            lastHudState.hp = '';
+            lastHudState.score = '';
+            lastHudState.level = '';
+            lastHudState.levelName = '';
+            lastHudState.pct = '';
+            lastHudState.ariaPct = '';
+            lastHudState.lockKey = '';
+        }
 
         let playerHp = 3;
         let playerScore = 0;
@@ -92,9 +106,12 @@
             w: 60,
             h: 90,
             vy: 0,
-            jumpPower: -13.8,
-            gravity: 0.72,
-            grounded: false
+            jumpPower: -17.5,
+            gravity: 0.68,
+            grounded: false,
+            jumpsRemaining: 2,
+            coyoteTimer: 0,
+            jumpBufferTimer: 0
         };
 
         let boss = { active: true, xOffset: 5200, w: 140, h: 140, hp: 2, hurtTimer: 0 };
@@ -103,40 +120,88 @@
         let obstacles = [];
         let decors = []; // Çevre dekorları (Tuğlalar, kaktüsler)
 
+        const particles = Array.from({ length: 64 }, () => ({
+            active: false,
+            x: 0,
+            y: 0,
+            vx: 0,
+            vy: 0,
+            gravity: 0,
+            size: 4,
+            life: 0,
+            maxLife: 1,
+            color: '#fff'
+        }));
+
+        function spawnParticles(x, y, count, kind) {
+            let spawned = 0;
+            for (let i = 0; i < particles.length && spawned < count; i++) {
+                const p = particles[i];
+                if (p.active) continue;
+                p.active = true;
+                p.x = x + (Math.random() - 0.5) * 14;
+                p.y = y + (Math.random() - 0.5) * 8;
+                if (kind === 'hit') {
+                    p.vx = (Math.random() - 0.5) * 5.8;
+                    p.vy = -Math.random() * 4.6 - 1.4;
+                    p.gravity = 0.22;
+                    p.size = 5 + Math.floor(Math.random() * 3);
+                    p.maxLife = 20 + Math.random() * 10;
+                    p.color = spawned % 2 === 0 ? '#fc8181' : '#ffd700';
+                } else if (kind === 'sparkle') {
+                    p.vx = (Math.random() - 0.5) * 4.4;
+                    p.vy = -Math.random() * 3.8 - 1.0;
+                    p.gravity = 0.12;
+                    p.size = 4 + Math.floor(Math.random() * 3);
+                    p.maxLife = 18 + Math.random() * 10;
+                    p.color = spawned % 2 === 0 ? '#9EC1A3' : '#ffd700';
+                } else {
+                    p.vx = (Math.random() - 0.5) * 3.2;
+                    p.vy = -Math.random() * 2.2 - 0.5;
+                    p.gravity = 0.14;
+                    p.size = 4 + Math.floor(Math.random() * 2);
+                    p.maxLife = 14 + Math.random() * 8;
+                    p.color = spawned % 2 === 0 ? '#EAE7E1' : '#C7C3BA';
+                }
+                p.life = p.maxLife;
+                spawned++;
+            }
+        }
+
         const I18N = {
             tr: {
-                instructions: 'Karakter otomatik koşar.<br><br>Zıplamak için [BOŞLUK] tuşuna bas<br>veya ekrana dokun.<br><br>Engelleri aş, güçlendirmeleri topla!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> ile hızını ayarla.',
+                instructions: 'Karakter otomatik koşar.<br><br>Zıplamak ve Çift Zıplamak için [BOŞLUK] / [↑]<br>tuşuna bas veya ekrana dokun.<br><br>Engelleri aş, güçlendirmeleri topla!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> hız · <span style="color:#9EC1A3;">[P]</span> duraklat.',
                 start: 'OYUNA BAŞLA', unlocked: '🔓 AÇIK', locked: '🔒 KİLİTLİ', completed: '🔓 TAMAMLANDI',
                 gameover: 'Kariyer yolculuğunda ufak bir tökezleme! Ama pes etmek yok, kodlamaya ve gelişmeye devam!', restart: 'YENİDEN OYNA 🔄',
-                hire: 'Tebrikler! Lise, İTÜ ve Intertech simülasyonunu başarıyla tamamladın. Hikayenin bir sonraki bölümünü yazmak için benimle iletişime geç!',
+                hire: 'Tebrikler! Lise, İTÜ ve Intertech Stajı simülasyonunu başarıyla tamamladın. Hikayenin bir sonraki bölümünü yazmak için benimle iletişime geç!',
                 schedule: 'Toplantı Planla ☕', endless: '🎮 SONSUZ MODDA DEVAM ET (Yüksek Skor)', dir: 'ltr'
             },
             en: {
-                instructions: 'The character runs automatically.<br><br>Press [SPACE] to jump<br>or tap the screen.<br><br>Dodge obstacles, collect power-ups!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> to adjust your speed.',
+                instructions: 'The character runs automatically.<br><br>Press [SPACE] / [↑] to Jump &amp; Double Jump<br>or tap the screen.<br><br>Dodge obstacles, collect power-ups!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> speed · <span style="color:#9EC1A3;">[P]</span> pause.',
                 start: 'START GAME', unlocked: '🔓 UNLOCKED', locked: '🔒 LOCKED', completed: '🔓 COMPLETED',
                 gameover: 'A small stumble on the career journey! But never give up — keep coding and growing!', restart: 'PLAY AGAIN 🔄',
-                hire: 'Congrats! You completed the Lise, İTÜ and Intertech simulation. Get in touch with me to write the next chapter of the story!',
+                hire: 'Congrats! You completed the High School, İTÜ and Intertech Internship simulation. Get in touch with me to write the next chapter of the story!',
                 schedule: 'Schedule a Meeting ☕', endless: '🎮 CONTINUE IN ENDLESS MODE (High Score)', dir: 'ltr'
             },
             ar: {
-                instructions: 'الشخصية تجري تلقائيًا.<br><br>اضغط [مسافة] للقفز<br>أو المس الشاشة.<br><br>تجنب العقبات واجمع التعزيزات!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> لتعديل سرعتك.',
+                instructions: 'الشخصية تجري تلقائيًا.<br><br>اضغط [مسافة] / [↑] للقفز والقفز المزدوج<br>أو المس الشاشة.<br><br>تجنب العقبات واجمع التعزيزات!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> السرعة · <span style="color:#9EC1A3;">[P]</span> إيقاف مؤقت.',
                 start: 'ابدأ اللعبة', unlocked: '🔓 مفتوح', locked: '🔒 مقفل', completed: '🔓 مكتمل',
                 gameover: 'عثرة صغيرة في رحلة مسيرتك المهنية! لكن لا تستسلم، استمر بالبرمجة والتطور!', restart: 'إعادة اللعب 🔄',
-                hire: 'تهانينا! أكملت محاكاة الثانوية وجامعة İTÜ وIntertech. تواصل معي لكتابة الفصل التالي من القصة!',
+                hire: 'تهانينا! أكملت محاكاة الثانوية وجامعة İTÜ وتدريب Intertech. تواصل معي لكتابة الفصل التالي من القصة!',
                 schedule: 'حدد موعد اجتماع ☕', endless: '🎮 تابع في الوضع اللانهائي (أعلى نتيجة)', dir: 'rtl'
             },
             es: {
-                instructions: 'El personaje corre automáticamente.<br><br>Presiona [ESPACIO] para saltar<br>o toca la pantalla.<br><br>¡Esquiva obstáculos y recoge potenciadores!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> para ajustar tu velocidad.',
+                instructions: 'El personaje corre automáticamente.<br><br>Presiona [ESPACIO] / [↑] para Saltar y Doble Salto<br>o toca la pantalla.<br><br>¡Esquiva obstáculos y recoge potenciadores!<br><span style="color:#9EC1A3;">&lt; / &gt;</span> velocidad · <span style="color:#9EC1A3;">[P]</span> pausa.',
                 start: 'EMPEZAR JUEGO', unlocked: '🔓 DESBLOQUEADO', locked: '🔒 BLOQUEADO', completed: '🔓 COMPLETADO',
                 gameover: '¡Un pequeño tropiezo en tu trayectoria profesional! Pero no te rindas, ¡sigue programando y creciendo!', restart: 'JUGAR DE NUEVO 🔄',
-                hire: '¡Felicidades! Completaste la simulación de Lise, İTÜ e Intertech. ¡Contáctame para escribir el siguiente capítulo de la historia!',
+                hire: '¡Felicidades! Completaste la simulación de Secundaria, İTÜ y Prácticas en Intertech. ¡Contáctame para escribir el siguiente capítulo de la historia!',
                 schedule: 'Agendar una Reunión ☕', endless: '🎮 CONTINUAR EN MODO INFINITO (Mejor Puntaje)', dir: 'ltr'
             },
             ja: {
-                instructions: 'キャラクターは自動的に走ります。<br><br>[スペース]キーでジャンプ<br>または画面をタップ。<br><br>障害物を避けてパワーアップを集めよう！<br><span style="color:#9EC1A3;">&lt; / &gt;</span> で速度を調整。',
+                instructions: 'キャラクターは自動的に走ります。<br><br>[スペース] / [↑] でジャンプ＆二段ジャンプ<br>または画面をタップ。<br><br>障害物を避けてパワーアップを集めよう！<br><span style="color:#9EC1A3;">&lt; / &gt;</span> 速度 · <span style="color:#9EC1A3;">[P]</span> 一時停止。',
                 start: 'ゲームスタート', unlocked: '🔓 解放済み', locked: '🔒 ロック中', completed: '🔓 完了',
                 gameover: 'キャリアの旅でちょっとしたつまずき！でも諦めずにコーディングと成長を続けよう！', restart: 'もう一度プレイ 🔄',
-                hire: 'おめでとうございます！高校、İTÜ、Intertechのシミュレーションを完了しました。物語の次の章を一緒に書くために連絡してください！',
+                hire: 'おめでとうございます！高校、İTÜ、Intertechインターンシップのシミュレーションを完了しました。物語の次の章を一緒に書くために連絡してください！',
                 schedule: 'ミーティングを予約 ☕', endless: '🎮 エンドレスモードを続ける（ハイスコア）', dir: 'ltr'
             }
         };
@@ -188,7 +253,14 @@
                 b.setAttribute('aria-pressed', String(isActive));
             });
 
+            const cardLabel1 = document.getElementById('card-label-1');
+            const cardLabel3 = document.getElementById('card-label-3');
+            if (cardLabel1) cardLabel1.textContent = lang === 'en' ? 'HIGH SCHOOL' : 'FEN LİSESİ';
+            if (cardLabel3) cardLabel3.textContent = lang === 'en' ? 'INTERTECH INTERNSHIP' : 'INTERTECH STAJI';
+
+            invalidateHudCache();
             updateLevelLocks();
+            updateHUD();
         }
 
         document.querySelectorAll('.lang-btn').forEach((btn) => {
@@ -244,47 +316,113 @@
         }
 
         function updateHUD() {
-            if (uiHp) uiHp.innerText = Math.max(0, playerHp);
-            if (uiScore) uiScore.innerText = playerScore <= 100 ? (playerScore.toFixed(1)) : Math.floor(playerScore);
             currentLevel = gameDistance >= 9800 ? 3 : (gameDistance >= 6200 ? 2 : 1);
-            if (uiLevel) uiLevel.innerText = currentLevel;
-            if (uiLevelName) {
-                if (endlessMode) {
-                    uiLevelName.innerText = 'SONSUZ MOD · En İyi: ' + bestScore;
-                } else {
-                    uiLevelName.innerText = currentLevel === 1 ? 'FEN LİSESİ' : (currentLevel === 2 ? 'İTÜ' : 'INTERTECH');
+            const hpVal = Math.max(0, playerHp);
+            const scoreStr = playerScore === 0
+                ? '0'
+                : (playerScore < 100
+                    ? (Math.abs(playerScore - Math.round(playerScore)) < 0.005 ? String(Math.round(playerScore)) : playerScore.toFixed(2))
+                    : String(Math.floor(playerScore)));
+            const isEn = currentLang === 'en';
+            const levelNameStr = endlessMode
+                ? (isEn ? 'ENDLESS MODE · Best: ' : 'SONSUZ MOD · En İyi: ') + bestScore
+                : (currentLevel === 1
+                    ? (isEn ? 'HIGH SCHOOL' : 'FEN LİSESİ')
+                    : (currentLevel === 2 ? 'İTÜ' : (isEn ? 'INTERTECH INTERNSHIP' : 'INTERTECH STAJI')));
+
+            let pct = 0;
+            if (endlessMode) {
+                pct = 100;
+            } else if (gameDistance < 6200) {
+                pct = (gameDistance / 6200) * 100;
+            } else if (gameDistance < 9800) {
+                pct = ((gameDistance - 6200) / (9800 - 6200)) * 100;
+            } else {
+                pct = ((gameDistance - 9800) / (12700 - 9800)) * 100;
+            }
+            const clampedPct = Math.max(0, Math.min(100, pct));
+            const pctStr = clampedPct.toFixed(1);
+
+            const hudKey = `${hpVal}|${scoreStr}|${currentLevel}|${levelNameStr}|${pctStr}|${completedLevels}|${currentLang}`;
+            if (hudKey === lastHudKey) return;
+            lastHudKey = hudKey;
+
+            const hpStr = String(hpVal);
+            if (uiHp && lastHudState.hp !== hpStr) {
+                lastHudState.hp = hpStr;
+                uiHp.innerText = hpStr;
+            }
+            if (uiScore && lastHudState.score !== scoreStr) {
+                lastHudState.score = scoreStr;
+                uiScore.innerText = scoreStr;
+            }
+            const levelStr = String(currentLevel);
+            if (uiLevel && lastHudState.level !== levelStr) {
+                lastHudState.level = levelStr;
+                uiLevel.innerText = levelStr;
+            }
+            if (uiLevelName && lastHudState.levelName !== levelNameStr) {
+                lastHudState.levelName = levelNameStr;
+                uiLevelName.innerText = levelNameStr;
+            }
+            if (uiProgressFill && lastHudState.pct !== pctStr) {
+                lastHudState.pct = pctStr;
+                uiProgressFill.style.width = `${pctStr}%`;
+                const ariaStr = String(Math.round(clampedPct));
+                if (lastHudState.ariaPct !== ariaStr) {
+                    lastHudState.ariaPct = ariaStr;
+                    if (uiProgressFill.parentElement && uiProgressFill.parentElement.getAttribute('role') === 'progressbar') {
+                        uiProgressFill.parentElement.setAttribute('aria-valuenow', ariaStr);
+                    }
                 }
             }
-            if (uiProgressFill) {
-                let pct = 0;
-                if (endlessMode) {
-                    pct = 100;
-                } else if (gameDistance < 6200) {
-                    pct = (gameDistance / 6200) * 100;
-                } else if (gameDistance < 9800) {
-                    pct = ((gameDistance - 6200) / (9800 - 6200)) * 100;
-                } else {
-                    pct = ((gameDistance - 9800) / (12600 - 9800)) * 100;
-                }
-                const clamped = Math.max(0, Math.min(100, pct));
-                uiProgressFill.style.width = `${clamped.toFixed(1)}%`;
-                if (uiProgressFill.parentElement && uiProgressFill.parentElement.getAttribute('role') === 'progressbar') {
-                    uiProgressFill.parentElement.setAttribute('aria-valuenow', String(Math.round(clamped)));
-                }
+            const lockKey = `${completedLevels}|${currentLang}`;
+            if (lastHudState.lockKey !== lockKey) {
+                lastHudState.lockKey = lockKey;
+                updateLevelLocks();
             }
-            updateLevelLocks();
         }
 
         function showLevelCelebration(level) {
             if (!levelCelebrationUI) return;
+            lastFrameTime = 0;
             celebrationLevel = level;
             const title = levelCelebrationUI.querySelector('h2');
             const message = levelCelebrationUI.querySelector('p');
             const button = continueLevelBtn;
-            const milestones = {
+            const isEn = currentLang === 'en';
+            const milestones = isEn ? {
+                1: {
+                    title: 'LEVEL 1 COMPLETE!',
+                    message: 'Ranked 457th nationwide! Defeated the YKS boss with 97.92 GPA.<br><div class="milestone-badges">' +
+                        '<span class="milestone-badge">🎓 97.92/100 GPA</span>' +
+                        '<span class="milestone-badge">🏫 Eskişehir Fatih Fen Lisesi</span>' +
+                        '<span class="milestone-badge">💪 Effort</span>' +
+                        '<span class="milestone-badge">📏 Discipline</span></div>🏆 First career badge earned. İTÜ gates are now open!',
+                    button: 'UNLOCK İTÜ STAGE 🔓'
+                },
+                2: {
+                    title: 'LEVEL 2 COMPLETE!',
+                    message: 'Completed your İTÜ Computer Engineering journey!<br><div class="milestone-badges">' +
+                        '<span class="milestone-badge">💻 C / C++ / Python</span>' +
+                        '<span class="milestone-badge">🧮 Algorithms</span>' +
+                        '<span class="milestone-badge">🏢 BİDB Internship</span></div>🎓 Second badge earned. Intertech Internship stage is now open!',
+                    button: 'UNLOCK INTERTECH INTERNSHIP 🔓'
+                },
+                3: {
+                    title: 'LEVEL 3 COMPLETE!',
+                    message: 'Completed the Intertech Internship chapter — Software Engineer unlocked!<br><div class="milestone-badges">' +
+                        '<span class="milestone-badge">💼 Intertech Internship</span>' +
+                        '<span class="milestone-badge">🏢 QNB Internship</span>' +
+                        '<span class="milestone-badge">🤖 Agentic AI</span>' +
+                        '<span class="milestone-badge">💻 Backend &amp; API</span>' +
+                        '<span class="milestone-badge">🗄️ DB / SQL</span></div>🚀 All three stages completed!',
+                    button: 'COMPLETE JOURNEY 🏆'
+                }
+            } : {
                 1: {
                     title: 'LEVEL 1 TAMAMLANDI!',
-                    message: 'Türkiye 457.si oldun! YKS canavarını 97.99 puanla yendin.<br><div class="milestone-badges">' +
+                    message: 'Türkiye 457.\'si oldun! YKS canavarını 97.92 puanla yendin.<br><div class="milestone-badges">' +
                         '<span class="milestone-badge">🎓 97,92/100 Ortalama</span>' +
                         '<span class="milestone-badge">🏫 Eskişehir Fatih Fen Lisesi</span>' +
                         '<span class="milestone-badge">💪 Emek</span>' +
@@ -296,15 +434,16 @@
                     message: 'İTÜ Bilgisayar Mühendisliği macerasını tamamladın!<br><div class="milestone-badges">' +
                         '<span class="milestone-badge">💻 C / C++ / Python</span>' +
                         '<span class="milestone-badge">🧮 Algoritma</span>' +
-                        '<span class="milestone-badge">🏢 BİDB Stajı</span></div>🎓 İkinci rozetin hazır. Intertech seviyesi artık açıldı!',
-                    button: 'INTERTECH SEVİYESİNİ AÇ 🔓'
+                        '<span class="milestone-badge">🏢 BİDB Stajı</span></div>🎓 İkinci rozetin hazır. Intertech Stajı seviyesi artık açıldı!',
+                    button: 'INTERTECH STAJINI AÇ 🔓'
                 },
                 3: {
                     title: 'LEVEL 3 TAMAMLANDI!',
-                    message: 'Intertech deneyimini tamamladın, artık Software Engineer!<br><div class="milestone-badges">' +
+                    message: 'Intertech Stajı deneyimini tamamladın, artık Software Engineer!<br><div class="milestone-badges">' +
+                        '<span class="milestone-badge">💼 Intertech Stajı</span>' +
                         '<span class="milestone-badge">🏢 QNB Stajı</span>' +
                         '<span class="milestone-badge">🤖 Agentic AI</span>' +
-                        '<span class="milestone-badge">📚 RAG</span>' +
+                        '<span class="milestone-badge">💻 API &amp; Sistem</span>' +
                         '<span class="milestone-badge">🗄️ DB / SQL</span></div>🚀 Üç seviyenin tamamını bitirdin!',
                     button: 'KARİYERİ TAMAMLA 🏆'
                 }
@@ -319,11 +458,14 @@
         function takeDamage() {
             if (invincibilityTimer > 0) return;
             playerHp--;
-            invincibilityTimer = 60;
+            invincibilityTimer = 38;
             player.vy = -6;
+            player.coyoteTimer = 0;
+            spawnParticles(player.x + player.w / 2, player.y + player.h / 2, 10, 'hit');
             updateHUD();
 
             if (playerHp <= 0) {
+                lastFrameTime = 0;
                 gameState = 'GAME_OVER';
                 if (gameOverUI) gameOverUI.classList.remove('hidden');
                 updatePauseUI();
@@ -335,9 +477,12 @@
             player.y = groundY > player.h ? groundY - player.h : 0;
             player.vy = 0;
             player.grounded = true;
+            player.jumpsRemaining = 2;
+            player.coyoteTimer = 6;
+            player.jumpBufferTimer = 0;
             playerHp = 3;
             playerScore = 0;
-            gameSpeed = 5.6;
+            gameSpeed = 3.1;
             currentLevel = 1;
             completedLevels = 0;
             celebrationLevel = 0;
@@ -345,66 +490,73 @@
             speedBoostTimer = 0;
             speedHold = 1;
             endlessMode = false;
+            lastFrameTime = 0;
+            invalidateHudCache();
+            for (let i = 0; i < particles.length; i++) particles[i].active = false;
             updateLevelLocks();
             updateHUD();
 
             boss.active = true;
             boss.hp = 2;
+            boss.hurtTimer = 0;
             boss.xOffset = 5200;
             floatingTexts = [];
             if (gameOverUI) gameOverUI.classList.add('hidden');
             if (levelCelebrationUI) levelCelebrationUI.classList.add('hidden');
             canvasContainer.style.filter = '';
 
-            // Engeller — Lise: 4 engel (zaman/stres odaklı) · Üniversite: Vize/Final
+            // Engeller — Tüm 3 seviyede dengeli boşluklarla (550–850px)
             obstacles = [
-                { x: 1200, yOffset: 0, w: 70, h: 84, label: "Zaman Baskısı" },
-                { x: 1900, yOffset: 0, w: 70, h: 84, label: "Sınav Stresi" },
-                { x: 2700, yOffset: 0, w: 70, h: 84, label: "Geç Kalma" },
-                { x: 3600, yOffset: 0, w: 70, h: 84, label: "Kaygı" },
-                { x: 7000, yOffset: 0, w: 84, h: 98, label: "Vize", type: "uni" },
-                { x: 8000, yOffset: 0, w: 84, h: 98, label: "Final", type: "uni" },
-                { x: 4500, yOffset: 0, w: 50, h: 44, label: "Kuş", type: "bird" },
-                { x: 6900, yOffset: 0, w: 50, h: 44, label: "Kuş", type: "bird" },
-                { x: 10400, yOffset: 0, w: 50, h: 44, label: "Kuş", type: "bird" }
+                // Level 1 (0–6200)
+                { x: 1150, yOffset: 0, w: 70, h: 80, label: 'Zaman Baskısı' },
+                { x: 1950, yOffset: 0, w: 70, h: 80, label: 'Sınav Stresi' },
+                { x: 2800, yOffset: 0, w: 70, h: 80, label: 'Geç Kalma' },
+                { x: 3650, yOffset: 0, w: 70, h: 84, label: 'Kaygı' },
+                { x: 4450, yOffset: 24, w: 52, h: 44, label: 'Kuş', type: 'bird' },
+                // Level 2 (6200–9800)
+                { x: 6850, yOffset: 0, w: 76, h: 86, label: 'Vize', type: 'uni' },
+                { x: 7500, yOffset: 24, w: 52, h: 44, label: 'Kuş', type: 'bird' },
+                { x: 8150, yOffset: 0, w: 76, h: 86, label: 'Algoritma', type: 'uni' },
+                { x: 8850, yOffset: 0, w: 78, h: 86, label: 'Final', type: 'uni' },
+                // Level 3 (9800–12800)
+                { x: 10450, yOffset: 0, w: 74, h: 82, label: 'Bug', type: 'uni' },
+                { x: 11150, yOffset: 0, w: 74, h: 82, label: 'Latency', type: 'uni' },
+                { x: 11800, yOffset: 24, w: 52, h: 44, label: 'Kuş', type: 'bird' },
+                { x: 12300, yOffset: 0, w: 76, h: 84, label: 'Prod Deploy', type: 'uni' }
             ];
 
-            // Eşyalar (Q-Block / Coin / İksir(Potion))
+            // Eşyalar (Q-Block / Coin / İksir / Teknoloji)
             items = [
-                // Lise - 3 Coin: Çaba + Emek + Disiplin = 97.99 YKS puanı
-                { x: 900, yOffset: 130, w: 56, h: 48, label: "Çaba (+32.99)", val: 32.99, type: "tech", logo: "book" },
-                { x: 2300, yOffset: 130, w: 56, h: 48, label: "Emek (+32.5)", val: 32.5, type: "tech", logo: "book" },
-                { x: 3300, yOffset: 130, w: 56, h: 48, label: "Disiplin (+32.5)", val: 32.5, type: "tech", logo: "book" },
-                // Hız iksiri (çiçek) - YKS öncesi bonus
-                { x: 1600, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 3900, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 5200, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 7200, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 8300, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 9200, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 10500, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
-                { x: 11900, yOffset: 10, w: 40, h: 40, label: "Hız +3x!", val: 5, type: "flower" },
+                // Level 1 - 3 Kitap: Çaba + Emek + Disiplin = 97.92 ortalama
+                { x: 900, yOffset: 130, w: 56, h: 48, label: 'Çaba (+32.92)', val: 32.92, type: 'tech', logo: 'book' },
+                { x: 2350, yOffset: 130, w: 56, h: 48, label: 'Emek (+32.5)', val: 32.5, type: 'tech', logo: 'book' },
+                { x: 3250, yOffset: 130, w: 56, h: 48, label: 'Disiplin (+32.5)', val: 32.5, type: 'tech', logo: 'book' },
+                // Hız çiçekleri (yumuşak +1.45x tempo)
+                { x: 1550, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
+                { x: 4100, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
+                { x: 7180, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
+                { x: 8500, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
+                { x: 10920, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
+                { x: 12050, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' },
 
                 // YKS Sonrası Kupa
-                { x: 5900, yOffset: 80, w: 98, h: 126, label: "TR 457.", val: 100, type: "trophy" },
+                { x: 5900, yOffset: 80, w: 98, h: 126, label: 'TR 457.', val: 100, type: 'trophy' },
 
-                // İTÜ Bilgisayar Mühendisliği - CV becerileri + BİDB stajı
-                { x: 6900, yOffset: 120, w: 56, h: 56, label: "C", val: 15, type: "qblock" },
-                { x: 7400, yOffset: 130, w: 60, h: 60, label: "C++", val: 15, type: "tech", logo: "cpp" },
-                { x: 7900, yOffset: 140, w: 42, h: 56, label: "Algoritma", val: 15, type: "coin" },
-                { x: 8400, yOffset: 130, w: 60, h: 60, label: "Python", val: 15, type: "tech", logo: "python" },
-                { x: 8900, yOffset: 140, w: 56, h: 72, label: "BİDB Stajı", val: 30, type: "potion" },
-                // Level 2 bitiş ödülü: İTÜ diploması
-                { x: 9500, yOffset: 80, w: 98, h: 126, label: "İTÜ DİPLOMASI", val: 150, type: "trophy" },
+                // Level 2 - İTÜ Bilgisayar Mühendisliği + BİDB stajı
+                { x: 6520, yOffset: 125, w: 56, h: 56, label: 'C', val: 15, type: 'qblock' },
+                { x: 7820, yOffset: 130, w: 60, h: 60, label: 'C++', val: 15, type: 'tech', logo: 'cpp' },
+                { x: 8480, yOffset: 135, w: 42, h: 56, label: 'Veri Yapıları', val: 15, type: 'coin' },
+                { x: 8620, yOffset: 130, w: 60, h: 60, label: 'Python', val: 15, type: 'tech', logo: 'python' },
+                { x: 9180, yOffset: 135, w: 56, h: 72, label: 'BİDB Stajı', val: 30, type: 'potion' },
+                { x: 9550, yOffset: 80, w: 98, h: 126, label: 'İTÜ DİPLOMASI', val: 150, type: 'trophy' },
 
-                // Level 3 - Intertech dönemi: büyük iksirler + skiller
-                { x: 10100, yOffset: 140, w: 56, h: 72, label: "QNB Stajı", val: 40, type: "potion" },
-                { x: 10600, yOffset: 140, w: 56, h: 72, label: "Agentic AI", val: 25, type: "potion" },
-                { x: 11100, yOffset: 140, w: 56, h: 72, label: "RAG", val: 25, type: "potion" },
-                { x: 11600, yOffset: 130, w: 70, h: 60, label: "DB / SQL", val: 25, type: "tech", logo: "sql" },
-                { x: 12100, yOffset: 140, w: 72, h: 90, label: "Intertech Stajı", val: 60, type: "potion" },
-                // Level 3 bitiş ödülü: ilk profesyonel kariyer başarısı
-                { x: 12600, yOffset: 80, w: 98, h: 126, label: "SOFTWARE ENGINEER", val: 250, type: "trophy" }
+                // Level 3 - Intertech Stajı & QNB dönemi
+                { x: 10120, yOffset: 135, w: 56, h: 72, label: 'QNB Stajı', val: 40, type: 'potion' },
+                { x: 10760, yOffset: 135, w: 56, h: 72, label: 'Agentic AI', val: 25, type: 'potion' },
+                { x: 11450, yOffset: 135, w: 56, h: 72, label: 'API & Sistem', val: 25, type: 'potion' },
+                { x: 11640, yOffset: 130, w: 70, h: 60, label: 'DB / SQL', val: 25, type: 'tech', logo: 'sql' },
+                { x: 12050, yOffset: 135, w: 72, h: 90, label: 'Intertech Stajı', val: 60, type: 'potion' },
+                { x: 12700, yOffset: 80, w: 98, h: 126, label: 'SOFTWARE ENGINEER', val: 250, type: 'trophy' }
             ];
 
             // Dekoratif Tuğlalar ve Kaktüsleri Oluştur
@@ -446,8 +598,8 @@
 
         // --- PİXEL ART ÇİZİM FONKSİYONLARI ---
 
-        function drawPlayer(context) {
-            if (invincibilityTimer > 0 && Math.floor(Date.now() / 100) % 2 === 0) return;
+        function drawPlayer(context, now) {
+            if (invincibilityTimer > 0 && Math.floor(now / 90) % 2 === 0) return;
 
             if (ASSET_RUNNER.complete && ASSET_RUNNER.naturalWidth > 0) {
                 const aspect = ASSET_RUNNER.naturalWidth / ASSET_RUNNER.naturalHeight;
@@ -467,7 +619,7 @@
             context.fillRect(player.x + 14, player.y, player.w - 28, player.h);
         }
 
-        function drawBackgrounds(context) {
+        function drawBackgrounds(context, now) {
             const level = gameDistance >= 9800 ? 3 : (gameDistance >= 6200 ? 2 : 1);
 
             if (ASSET_BG_SKY.complete && ASSET_BG_SKY.naturalWidth > 0) {
@@ -495,10 +647,10 @@
             }
 
             const birdX = ((canvas.width + 200) - (gameDistance * 0.8) % (canvas.width + 1000));
-            const birdY = 80 + Math.sin(Date.now() / 300) * 20;
+            const birdY = 80 + Math.sin(now / 300) * 20;
             if (ASSET_BIRD_SKY.complete && ASSET_BIRD_SKY.naturalWidth > 0) {
                 const bw = 70, bh = bw * (ASSET_BIRD_SKY.naturalHeight / ASSET_BIRD_SKY.naturalWidth);
-                const flap = Math.sin(Date.now() / 150) * 0.08;
+                const flap = Math.sin(now / 150) * 0.08;
                 context.save();
                 context.translate(birdX + bw / 2, birdY + bh / 2);
                 context.rotate(flap);
@@ -533,7 +685,7 @@
             }
         }
 
-        function drawEntities(context) {
+        function drawEntities(context, now) {
             context.fillStyle = 'rgba(15, 23, 42, 0.28)';
             context.beginPath();
             context.ellipse(player.x + player.w / 2, groundY - 3, player.w * 0.7, 7, 0, 0, Math.PI * 2);
@@ -550,22 +702,20 @@
                     } else if (dec.type === 'tree') {
                         if (ASSET_TREE.complete && ASSET_TREE.naturalWidth > 0) {
                             const th = 150, tw = th * (ASSET_TREE.naturalWidth / ASSET_TREE.naturalHeight);
-                            context.save();
-                            context.shadowColor = 'rgba(0,0,0,0.4)'; context.shadowBlur = 8; context.shadowOffsetY = 4;
+                            context.fillStyle = 'rgba(10, 10, 20, 0.22)';
+                            context.beginPath();
+                            context.ellipse(dx + tw * 0.5, groundY - 2, tw * 0.36, 7, 0, 0, Math.PI * 2);
+                            context.fill();
                             context.drawImage(ASSET_TREE, dx, groundY - th + 6, tw, th);
-                            context.restore();
                         }
                     } else if (dec.type === 'brick') {
                         const by = groundY - dec.h - dec.yOffset;
-                        context.save();
-                        context.shadowColor = 'rgba(0,0,0,0.5)';
-                        context.shadowBlur = 8;
-                        context.shadowOffsetY = 3;
+                        context.fillStyle = 'rgba(0, 0, 0, 0.28)';
+                        context.fillRect(dx + 4, by + 4, dec.w, dec.h);
                         context.fillStyle = '#cb4154'; context.fillRect(dx, by, dec.w, dec.h);
                         context.fillStyle = '#000'; context.fillRect(dx, by, dec.w, 2); context.fillRect(dx, by + dec.h - 2, dec.w, 2);
                         context.fillRect(dx, by, 2, dec.h); context.fillRect(dx + dec.w - 2, by, 2, dec.h);
                         context.fillRect(dx, by + dec.h / 2, dec.w, 2); context.fillRect(dx + dec.w / 2, by, 2, dec.h / 2);
-                        context.restore();
                     }
                 }
             });
@@ -573,7 +723,11 @@
             if (boss.active && gameDistance > 3500 && gameDistance < 6000) {
                 const bx = boss.xOffset - gameDistance;
                 const by = groundY - boss.h;
-                context.globalAlpha = boss.hurtTimer > 0 && (Math.floor(Date.now() / 50) % 2 === 0) ? 0.5 : 1;
+                context.fillStyle = 'rgba(10, 10, 20, 0.32)';
+                context.beginPath();
+                context.ellipse(bx + boss.w / 2, groundY - 3, boss.w * 0.52, 9, 0, 0, Math.PI * 2);
+                context.fill();
+                context.globalAlpha = boss.hurtTimer > 0 && (Math.floor(now / 50) % 2 === 0) ? 0.5 : 1;
                 if (ASSET_SLIME.complete && ASSET_SLIME.naturalWidth > 0) {
                     const aspect = ASSET_SLIME.naturalWidth / ASSET_SLIME.naturalHeight;
                     const dh = boss.h + 20;
@@ -589,7 +743,7 @@
                     context.fillStyle = boss.hp === 1 ? '#ff1744' : '#b71c1c';
                     context.fillRect(bx, by, boss.w, boss.h);
                 }
-                drawTextBg(context, 'YKS', bx + 45, by - 30, 16, '#39ff14');
+                drawTextBg(context, boss.hp === 1 ? 'YKS (1 HP)' : 'YKS', bx + 35, by - 30, 15, '#39ff14');
                 context.globalAlpha = 1;
             }
 
@@ -598,12 +752,13 @@
                 const ox = obs.x - gameDistance;
                 const oy = groundY - obs.h - obs.yOffset;
                 if (ox < canvas.width && ox > -100) {
-                    context.save();
-                    context.shadowColor = 'rgba(0,0,0,0.55)';
-                    context.shadowBlur = 10;
-                    context.shadowOffsetY = 4;
+                    context.fillStyle = 'rgba(10, 10, 20, 0.28)';
+                    context.beginPath();
+                    context.ellipse(ox + obs.w / 2, groundY - 3, obs.w * 0.52, 7, 0, 0, Math.PI * 2);
+                    context.fill();
+
                     if (obs.type === 'bird') {
-                        const waddle = Math.sin(Date.now() / 120) * 4;
+                        const waddle = Math.sin(now / 120) * 4;
                         const by2 = oy + waddle;
                         context.fillStyle = '#fff';
                         context.beginPath(); context.ellipse(ox + obs.w * 0.45, by2 + obs.h * 0.55, obs.w * 0.4, obs.h * 0.4, 0, 0, Math.PI * 2); context.fill();
@@ -613,6 +768,8 @@
                         context.fillRect(ox + obs.w * 0.35, by2 + obs.h * 0.9, 6, 10); context.fillRect(ox + obs.w * 0.55, by2 + obs.h * 0.9, 6, 10);
                         context.fillStyle = '#000'; context.fillRect(ox + obs.w * 0.75, by2 + obs.h * 0.18, 4, 4);
                     } else if (obs.type === 'uni') {
+                        context.fillStyle = 'rgba(0, 0, 0, 0.28)';
+                        context.fillRect(ox + 4, oy + 4, obs.w, obs.h);
                         context.fillStyle = '#742a2a'; context.fillRect(ox, oy, obs.w, obs.h);
                         context.fillStyle = '#000'; context.fillRect(ox + 15, oy + 15, 15, 15); context.fillRect(ox + 40, oy + 15, 15, 15);
                     } else {
@@ -635,7 +792,6 @@
                         context.strokeRect(ox, oy, pw, obs.h);
                         context.strokeRect(ox + obs.w - pw, oy, pw, obs.h);
                     }
-                    context.restore();
                     drawTextBg(context, obs.label, ox - 10, oy - 15, 11, '#fc8181');
                 }
             });
@@ -646,40 +802,35 @@
                 let iy = groundY - item.h - item.yOffset;
 
                 if (ix < canvas.width && ix > -100) {
-                    context.save();
-                    context.fillStyle = 'rgba(10, 10, 20, 0.3)';
+                    context.fillStyle = 'rgba(10, 10, 20, 0.28)';
                     context.beginPath();
                     context.ellipse(ix + item.w / 2, groundY - 4, item.w * 0.55, 8, 0, 0, Math.PI * 2);
                     context.fill();
-                    if (item.type !== 'tech' && item.type !== 'flower') {
-                        const glow = context.createRadialGradient(ix + item.w / 2, iy + item.h / 2, 2, ix + item.w / 2, iy + item.h / 2, item.w * 0.9);
-                        glow.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
-                        glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                        context.fillStyle = glow;
-                        context.fillRect(ix - item.w * 0.4, iy - item.h * 0.4, item.w * 1.8, item.h * 1.8);
-                    }
-                    context.restore();
 
-                    context.save();
-                    context.shadowColor = 'rgba(0,0,0,0.5)';
-                    context.shadowBlur = 10;
-                    context.shadowOffsetY = 4;
+                    if (item.type !== 'tech' && item.type !== 'flower') {
+                        context.fillStyle = 'rgba(255, 255, 255, 0.14)';
+                        context.beginPath();
+                        context.arc(ix + item.w / 2, iy + item.h / 2, item.w * 0.68, 0, Math.PI * 2);
+                        context.fill();
+                    }
 
                     if (item.type === 'qblock') {
+                        context.fillStyle = 'rgba(0, 0, 0, 0.28)';
+                        context.fillRect(ix + 4, iy + 4, item.w, item.h);
                         context.fillStyle = '#f6ad55'; context.fillRect(ix, iy, item.w, item.h);
                         context.strokeStyle = '#fff3b0'; context.lineWidth = 3; context.strokeRect(ix + 2, iy + 2, item.w - 4, item.h - 4);
                         context.fillStyle = '#c05621'; context.fillRect(ix, iy + item.h - 4, item.w, 4); context.fillRect(ix + item.w - 4, iy, 4, item.h);
                         context.fillStyle = '#9c4221'; context.fillRect(ix + 2, iy + 2, 4, 4); context.fillRect(ix + item.w - 6, iy + 2, 4, 4); context.fillRect(ix + 2, iy + item.h - 6, 4, 4);
                         context.fillStyle = '#fff'; context.font = '32px "Press Start 2P"'; context.fillText('?', ix + item.w / 2 - 10, iy + 42);
                     } else if (item.type === 'coin') {
-                        const anim = Math.sin(Date.now() / 150);
-                        const width = item.w * Math.abs(anim);
+                        const anim = Math.sin(now / 150);
+                        const width = Math.max(4, item.w * Math.abs(anim));
                         context.fillStyle = '#f6e05e';
                         context.beginPath(); context.ellipse(ix + item.w / 2, iy + item.h / 2, width / 2, item.h / 2, 0, 0, Math.PI * 2); context.fill();
                         context.strokeStyle = '#b7791f'; context.lineWidth = 3; context.stroke();
                         if (Math.abs(anim) > 0.3) { context.fillStyle = '#fff'; context.fillRect(ix + item.w / 2 - 2, iy + 10, 4, item.h - 20); }
                     } else if (item.type === 'potion') {
-                        const bob = Math.sin(Date.now() / 200) * 5;
+                        const bob = Math.sin(now / 200) * 5;
                         const py = iy + bob;
                         context.fillStyle = '#b026ff';
                         context.fillRect(ix + item.w * 0.32, py, item.w * 0.36, item.h * 0.22);
@@ -696,17 +847,15 @@
                         context.fillRect(ix + item.w * 0.3, py + item.h * 0.4, item.w * 0.14, item.h * 0.4);
                     } else if (item.type === 'tech') {
                         const logoImg = TECH_LOGOS[item.logo];
-                        const bob = Math.sin(Date.now() / 220) * 5;
+                        const bob = Math.sin(now / 220) * 5;
                         if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
                             context.drawImage(logoImg, ix, iy + bob, item.w, item.h);
                         } else {
                             context.fillStyle = '#2d3748'; context.fillRect(ix, iy + bob, item.w, item.h);
                         }
                     } else if (item.type === 'flower') {
-                        const bob = Math.sin(Date.now() / 180) * 4;
+                        const bob = Math.sin(now / 180) * 4;
                         const fy = iy + bob;
-                        context.save();
-                        context.shadowColor = 'rgba(0,0,0,0.4)'; context.shadowBlur = 6;
                         context.fillStyle = '#2f855a';
                         context.fillRect(ix + item.w * 0.42, fy + item.h * 0.35, item.w * 0.16, item.h * 0.65);
                         context.fillStyle = '#38a169';
@@ -716,9 +865,8 @@
                         context.beginPath(); context.arc(ix + item.w * 0.5, fy + item.h * 0.28, item.w * 0.28, 0, Math.PI * 2); context.fill();
                         context.fillStyle = '#fc8181';
                         context.beginPath(); context.arc(ix + item.w * 0.4, fy + item.h * 0.2, item.w * 0.1, 0, Math.PI * 2); context.fill();
-                        context.restore();
                     } else if (item.type === 'trophy') {
-                        iy += Math.sin(Date.now() / 150) * 10;
+                        iy += Math.sin(now / 150) * 10;
                         context.fillStyle = '#ffd700'; context.fillRect(ix + 10, iy, item.w - 20, item.h / 2);
                         context.beginPath(); context.arc(ix + item.w / 2, iy + item.h / 2, item.w / 2 - 10, 0, Math.PI); context.fill();
                         context.fillRect(ix + item.w / 2 - 10, iy + item.h / 2 + 10, 20, item.h / 3);
@@ -727,91 +875,155 @@
                         context.beginPath(); context.arc(ix + 5, iy + 25, 20, Math.PI / 2, Math.PI * 1.5); context.stroke();
                         context.beginPath(); context.arc(ix + item.w - 5, iy + 25, 20, -Math.PI / 2, Math.PI / 2); context.stroke();
                     }
-                    context.restore();
                     if (item.type !== 'trophy') drawTextBg(context, item.label, ix - 10, iy - 20, 11, '#fff');
                 }
             });
         }
 
         // --- GÜNCELLEME DÖNGÜSÜ ---
-        function update() {
+        function update(dt) {
             if (gameState !== 'PLAYING') return;
 
-            if (invincibilityTimer > 0) invincibilityTimer--;
-            if (speedBoostTimer > 0) speedBoostTimer--;
+            if (invincibilityTimer > 0) invincibilityTimer = Math.max(0, invincibilityTimer - dt);
+            if (speedBoostTimer > 0) speedBoostTimer = Math.max(0, speedBoostTimer - dt);
+            if (boss.hurtTimer > 0) boss.hurtTimer = Math.max(0, boss.hurtTimer - dt);
+            if (player.coyoteTimer > 0) player.coyoteTimer = Math.max(0, player.coyoteTimer - dt);
+            if (player.jumpBufferTimer > 0) player.jumpBufferTimer = Math.max(0, player.jumpBufferTimer - dt);
 
-            player.vy += player.gravity;
-            player.y += player.vy;
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                floatingTexts[i].life -= dt;
+                if (floatingTexts[i].life <= 0) floatingTexts.splice(i, 1);
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                if (!p.active) continue;
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                p.vy += p.gravity * dt;
+                p.life -= dt;
+                if (p.life <= 0) p.active = false;
+            }
+
+            const wasGrounded = player.grounded;
+            player.vy += player.gravity * dt;
+            player.y += player.vy * dt;
 
             if (player.y + player.h >= groundY) {
                 player.y = groundY - player.h;
                 player.vy = 0;
                 player.grounded = true;
+                player.jumpsRemaining = 2;
+                player.coyoteTimer = 6;
+                if (!wasGrounded) {
+                    spawnParticles(player.x + player.w / 2, groundY - 2, 6, 'dust');
+                }
             } else {
                 player.grounded = false;
             }
 
-            gameDistance += gameSpeed * (speedBoostTimer > 0 ? 3 : 1) * speedHold;
+            if (player.jumpBufferTimer > 0) {
+                if (player.grounded || player.coyoteTimer > 0) {
+                    player.vy = player.jumpPower;
+                    player.grounded = false;
+                    player.coyoteTimer = 0;
+                    player.jumpBufferTimer = 0;
+                    player.jumpsRemaining = 1;
+                    spawnParticles(player.x + player.w / 2, groundY - 4, 7, 'dust');
+                } else if (player.jumpsRemaining > 0) {
+                    player.vy = player.jumpPower * 0.86;
+                    player.jumpsRemaining = 0;
+                    player.jumpBufferTimer = 0;
+                    spawnParticles(player.x + player.w / 2, player.y + player.h - 4, 9, 'sparkle');
+                }
+            }
 
-            // Boss Çarpışması
+            const speedMultiplier = (speedBoostTimer > 0 ? 1.45 : 1) * speedHold;
+            gameDistance += gameSpeed * speedMultiplier * dt;
+
+            // Boss Çarpışması & Anti-AFK Duvarı
             if (boss.active && gameDistance > 3500) {
                 const bx = boss.xOffset - gameDistance;
                 const by = groundY - boss.h;
 
-                if (bx + 25 < player.x + player.w && bx + boss.w - 25 > player.x && player.y + player.h > by + 25 && player.y < by + boss.h) {
-                    if (player.vy > 0 && player.y + player.h < by + 70) {
-                        player.vy = -16;
-                        boss.hurtTimer = 10;
-                        if (playerScore >= 97.99) {
+                if (bx + 20 < player.x + player.w && bx + boss.w - 20 > player.x && player.y + player.h > by + 20 && player.y < by + boss.h) {
+                    if (player.vy > 0 && player.y + player.h < by + 80) {
+                        player.vy = -16.5;
+                        player.jumpsRemaining = 1;
+                        boss.hurtTimer = 18;
+                        spawnParticles(bx + boss.w / 2, by + 20, 12, 'hit');
+                        if (playerScore + 1e-6 >= 97.92) {
                             boss.hp = 0;
                             boss.active = false;
-                            spawnText('97.99 PUAN!', bx + 10, by - 45, '#ffd700');
+                            spawnText('97.92 PUAN!', bx + 10, by - 45, '#ffd700');
                             spawnText('YKS YENİLDİ!', bx, by - 70, '#39ff14');
                             updateHUD();
+                        } else if (boss.hp > 1) {
+                            boss.hp--;
+                            playerScore += 15;
+                            gameDistance = Math.max(0, gameDistance - 120);
+                            spawnText('YKS HASAR! +15', bx - 20, by - 35, '#ffeb3b');
+                            updateHUD();
                         } else {
-                            spawnText('YETERSİZ PUAN ' + playerScore.toFixed(2) + '/97.99', bx - 60, by - 20, '#ff0');
+                            boss.hp = 0;
+                            boss.active = false;
+                            playerScore += 15;
+                            spawnText('YKS YENİLDİ!', bx, by - 65, '#39ff14');
+                            updateHUD();
                         }
                     } else {
-                        spawnText('HASAR!', player.x, player.y, '#f00');
+                        spawnText('HASAR!', player.x, player.y - 10, '#f00');
                         takeDamage();
+                        gameDistance = Math.max(0, gameDistance - 240);
+                    }
+                }
+
+                if (boss.active) {
+                    const bossWallDist = boss.xOffset - player.x;
+                    if (gameDistance > bossWallDist) {
+                        gameDistance = bossWallDist;
                     }
                 }
             }
 
-            // Engeller
+            // Engeller (adil kenar boşluğu: 12px yatay, 8px üst)
             obstacles.forEach((obs) => {
                 if (obs.cleared) return;
                 const ox = obs.x - gameDistance;
                 const oy = groundY - obs.h - obs.yOffset;
-                if (player.x + 15 < ox + obs.w && player.x + player.w - 15 > ox && player.y + player.h > oy + 15 && player.y < oy + obs.h) {
+                if (player.x + 12 < ox + obs.w - 12 && player.x + player.w - 12 > ox + 12 && player.y + player.h > oy + 8 && player.y + 8 < oy + obs.h) {
                     obs.cleared = true;
                     spawnText('ENGEL!', player.x, player.y - 20, '#f00');
                     takeDamage();
                 }
             });
 
-            // İtemler
+            // İtemler (+10px cömert toplama alanı)
             items.forEach((item) => {
                 if (item.collected) return;
                 const ix = item.x - gameDistance;
                 const iy = groundY - item.h - item.yOffset;
-                if (player.x < ix + item.w && player.x + player.w > ix && player.y + player.h > iy && player.y < iy + item.h) {
+                if (player.x - 10 < ix + item.w && player.x + player.w + 10 > ix && player.y + player.h + 10 > iy && player.y - 10 < iy + item.h) {
                     item.collected = true;
 
                     if (item.type === 'flower') {
-                        speedBoostTimer = 180;
-                        spawnText('HIZ +3x!', player.x, player.y - 30, '#ff69b4');
+                        speedBoostTimer = 200;
+                        spawnText('Hız +1.5x!', player.x, player.y - 30, '#ff69b4');
+                        spawnParticles(ix + item.w / 2, iy + item.h / 2, 8, 'sparkle');
                     } else if (item.type === 'trophy') {
                         completedLevels = Math.max(completedLevels, currentLevel);
                         const rewardText = currentLevel === 1 ? 'TÜRKİYE 457.Sİ!' : (currentLevel === 2 ? 'İTÜ DİPLOMASI!' : 'SOFTWARE ENGINEER!');
                         spawnText(rewardText, player.x - 40, player.y - 40, '#ffd700');
+                        spawnParticles(ix + item.w / 2, iy + item.h / 2, 16, 'sparkle');
                         updateLevelLocks();
                         checkpointDistance = currentLevel === 1 ? 6200 : (currentLevel === 2 ? 9800 : gameDistance);
                         checkpointScore = playerScore + item.val;
+                        lastFrameTime = 0;
                         gameState = 'CELEBRATION';
                         showLevelCelebration(currentLevel);
                     } else {
                         spawnText('+ ' + item.label, player.x, player.y - 30, '#39ff14');
+                        spawnParticles(ix + item.w / 2, iy + item.h / 2, 8, 'sparkle');
                     }
 
                     playerScore += item.val;
@@ -857,20 +1069,29 @@
         }
 
         function draw() {
+            const now = performance.now();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            drawBackgrounds(ctx);
-            drawEntities(ctx);
+            drawBackgrounds(ctx, now);
+            drawEntities(ctx, now);
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                if (!p.active) continue;
+                ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+            }
+            ctx.globalAlpha = 1;
+
             if (gameState !== 'END_HIRE_ME') {
-                drawPlayer(ctx);
+                drawPlayer(ctx, now);
             }
 
             for (let i = floatingTexts.length - 1; i >= 0; i--) {
                 const ft = floatingTexts[i];
-                ctx.globalAlpha = ft.life / 40;
+                ctx.globalAlpha = Math.max(0, ft.life / 40);
                 drawTextBg(ctx, ft.text, ft.x, ft.y - (40 - ft.life), 12, ft.color);
-                ft.life--;
-                if (ft.life <= 0) floatingTexts.splice(i, 1);
             }
             ctx.globalAlpha = 1;
 
@@ -879,9 +1100,16 @@
             }
         }
 
-        function loop() {
+        function loop(timestamp) {
             try {
-                if (gameState === 'PLAYING') update();
+                if (gameState === 'PLAYING') {
+                    const ts = typeof timestamp === 'number' ? timestamp : performance.now();
+                    const dt = lastFrameTime ? Math.min((ts - lastFrameTime) / (1000 / 60), 2.5) : 1;
+                    lastFrameTime = ts;
+                    update(dt);
+                } else {
+                    lastFrameTime = 0;
+                }
                 if (gameState === 'PLAYING' || gameState === 'START' || gameState === 'CELEBRATION' || gameState === 'PAUSED') draw();
             } catch (e) {
                 console.error('Oyun döngüsü hatası (yakalandı, oyun durmadı):', e);
@@ -890,9 +1118,14 @@
         }
 
         function jump() {
-            if (gameState === 'PLAYING' && player.grounded) {
-                player.vy = player.jumpPower;
-                player.grounded = false;
+            if (gameState === 'PLAYING') {
+                player.jumpBufferTimer = 10;
+            }
+        }
+
+        function releaseJump() {
+            if (gameState === 'PLAYING' && player.vy < -6) {
+                player.vy *= 0.6;
             }
         }
 
@@ -900,7 +1133,9 @@
             if (gameState === 'PLAYING') {
                 gameState = 'PAUSED';
                 speedHold = 1;
+                lastFrameTime = 0;
             } else if (gameState === 'PAUSED') {
+                lastFrameTime = 0;
                 gameState = 'PLAYING';
             } else {
                 return;
@@ -929,20 +1164,30 @@
 
             if (e.code === 'Space' || e.code === 'ArrowUp') {
                 e.preventDefault();
-                jump();
+                if (!e.repeat) jump();
             }
             if (e.code === 'ArrowRight' || e.key === '>' || e.key === '.') {
-                speedHold = 1.6;
+                speedHold = 1.55;
                 e.preventDefault();
             }
             if (e.code === 'ArrowLeft' || e.key === '<' || e.key === ',') {
-                speedHold = 0.55;
+                speedHold = 0.6;
                 e.preventDefault();
             }
         });
 
         window.addEventListener('keyup', (e) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                releaseJump();
+            }
             if (e.code === 'ArrowRight' || e.code === 'ArrowLeft' || e.key === '>' || e.key === '<' || e.key === '.' || e.key === ',') {
+                speedHold = 1;
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                lastFrameTime = 0;
                 speedHold = 1;
             }
         });
@@ -954,11 +1199,15 @@
             }
         }, { passive: false });
 
-        canvas.addEventListener('mousedown', () => {
-            if (gameState === 'PLAYING') {
+        canvas.addEventListener('touchend', () => releaseJump());
+        canvas.addEventListener('touchcancel', () => releaseJump());
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (gameState === 'PLAYING' && e.button === 0) {
                 jump();
             }
         });
+        canvas.addEventListener('mouseup', () => releaseJump());
 
         if (touchLayer) {
             touchLayer.addEventListener('touchstart', (e) => {
@@ -967,6 +1216,8 @@
                     jump();
                 }
             }, { passive: false });
+            touchLayer.addEventListener('touchend', () => releaseJump());
+            touchLayer.addEventListener('touchcancel', () => releaseJump());
         }
 
         if (startRunBtn) {
@@ -976,6 +1227,7 @@
                 checkpointDistance = 0;
                 checkpointScore = 0;
                 initGame();
+                lastFrameTime = 0;
                 gameState = 'PLAYING';
                 updatePauseUI();
                 startRunBtn.blur();
@@ -997,6 +1249,7 @@
                 speedBoostTimer = 0;
                 invincibilityTimer = 0;
                 speedHold = 1;
+                lastFrameTime = 0;
                 canvasContainer.style.filter = '';
 
                 if (!wasEndless && savedCompleted > 0 && savedCompleted < 3) {
@@ -1013,6 +1266,7 @@
                 }
 
                 currentLevel = gameDistance >= 9800 ? 3 : (gameDistance >= 6200 ? 2 : 1);
+                lastHudKey = '';
                 updateLevelLocks();
                 updateHUD();
                 gameState = 'PLAYING';
@@ -1027,6 +1281,7 @@
                 if (levelCelebrationUI) levelCelebrationUI.classList.add('hidden');
 
                 if (celebrationLevel === 3) {
+                    lastFrameTime = 0;
                     gameState = 'END_HIRE_ME';
                     if (hireMeModal) hireMeModal.classList.remove('hidden');
                     canvasContainer.style.filter = 'brightness(0.3)';
@@ -1039,6 +1294,12 @@
                 player.y = groundY - player.h;
                 player.vy = 0;
                 player.grounded = true;
+                player.jumpsRemaining = 2;
+                player.coyoteTimer = 6;
+                player.jumpBufferTimer = 0;
+                speedHold = 1;
+                lastFrameTime = 0;
+                lastHudKey = '';
                 updateHUD();
                 gameState = 'PLAYING';
                 updatePauseUI();
@@ -1052,6 +1313,8 @@
                 if (hireMeModal) hireMeModal.classList.add('hidden');
                 canvasContainer.style.filter = '';
                 endlessMode = true;
+                lastFrameTime = 0;
+                lastHudKey = '';
                 gameState = 'PLAYING';
                 updateHUD();
                 updatePauseUI();
@@ -1113,17 +1376,18 @@
                 items.length ? items[items.length - 1].x : 0
             );
             if (furthestX - gameDistance < canvas.width * 1.5) {
-                const nx = furthestX + 500 + Math.random() * 400;
+                const nx = furthestX + 550 + Math.random() * 250;
                 if (Math.random() < 0.55) {
                     const kinds = [
-                        { w: 70, h: 84, label: 'Zorluk' }, { w: 50, h: 44, label: 'Kuş', type: 'bird' }
+                        { w: 70, h: 82, yOffset: 0, label: 'Zorluk' },
+                        { w: 52, h: 44, yOffset: 24, label: 'Kuş', type: 'bird' }
                     ];
                     const k = kinds[Math.floor(Math.random() * kinds.length)];
-                    obstacles.push({ x: nx, yOffset: 0, w: k.w, h: k.h, label: k.label, type: k.type });
+                    obstacles.push({ x: nx, yOffset: k.yOffset, w: k.w, h: k.h, label: k.label, type: k.type });
                 } else {
                     const r = Math.random();
                     if (r < 0.3) {
-                        items.push({ x: nx, yOffset: 10, w: 40, h: 40, label: 'Hız +3x!', val: 5, type: 'flower' });
+                        items.push({ x: nx, yOffset: 10, w: 40, h: 40, label: 'Hız +1.5x!', val: 5, type: 'flower' });
                     } else {
                         const logos = ['book', 'python', 'sql', 'cpp'];
                         const lg = logos[Math.floor(Math.random() * logos.length)];

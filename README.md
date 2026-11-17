@@ -13,11 +13,11 @@ Built with zero build tools and zero runtime frontend frameworks so every page d
 
 ```text
 portfolio/
-├── index.html                  # Editorial landing page, selected works index, snapshot & contact
+├── index.html                  # Editorial Home page, selected works, snapshot & contact
 ├── about.html                  # Full biography, Harvard CV hub, experience, education, credentials & skills
 ├── projects.html               # Filterable architectural case studies (AI & Agents, Systems, Web)
 ├── journey.html                # Embedded 16:9 stage for "Enis's Career Journey"
-├── enis_journey.html           # Original standalone single-file game edition (preserved intact)
+├── enis_journey.html           # Original standalone single-file game edition
 ├── deploy-itu.ps1              # Staging & SCP deployment script for web.itu.edu.tr/otag23/
 ├── README.md                   # Repository documentation (excluded from web upload)
 └── assets/
@@ -26,6 +26,8 @@ portfolio/
     ├── js/
     │   ├── main.js             # Bilingual TR/EN switcher, theme toggle, mobile nav, CV links & project filters
     │   └── game-engine.js      # HTML5 Canvas game engine with inline pixel-art assets & 5-language I18N
+    ├── img/
+    │   └── profile.jpg         # Editorial portrait photo displayed on Home (index.html)
     └── cv/
         ├── enis_cv_tr.pdf      # Harvard-style Curriculum Vitae (Türkçe)
         └── enis_cv_en.pdf      # Harvard-style Curriculum Vitae (English)
@@ -53,9 +55,9 @@ Both official Harvard-formatted PDF resumes are bundled directly in the reposito
 
 ## Game Integration Credit
 
-**Enis's Career Journey** (`journey.html` + `assets/js/game-engine.js`) is an interactive 2D pixel-art side-scroller originally designed and built in HTML5 Canvas by **Enis's girlfriend**.
+**Enis's Career Journey** (`journey.html` + `assets/js/game-engine.js`) is an interactive 2D pixel-art side-scroller built in HTML5 Canvas and vanilla JavaScript with custom pixel-art sprites.
 
-It traces three playable chapters of Enis's academic and engineering journey—from **Eskişehir Fatih Fen Lisesi & the YKS 457th Rank Boss** to **Istanbul Technical University (İTÜ) & BİDB**, and onward to **Intertech AI Lab**—followed by an **Endless Mode** and 5-language UI support (`TR`, `EN`, `AR`, `ES`, `JA`). The original standalone edition remains preserved in `enis_journey.html`, while `journey.html` embeds the engine inside a responsive 16:9 stage with pause/resume (`[P]`), fullscreen toggle, and progress tracking.
+It traces three playable chapters of Enis's academic and engineering journey—from **Eskişehir Fatih Fen Lisesi & the YKS 457th Rank Boss** to **Istanbul Technical University (İTÜ) & BİDB**, and onward to **Intertech Internship**—followed by an **Endless Mode** and 5-language UI support (`TR`, `EN`, `AR`, `ES`, `JA`). The engine features delta-time paced movement, variable double-jump physics with coyote time and jump buffering, an anti-AFK YKS Boss encounter, and cached HUD rendering. The standalone single-file edition remains available in `enis_journey.html`, while `journey.html` embeds the engine inside a responsive 16:9 stage with pause/resume (`[P]`), fullscreen toggle, and progress tracking.
 
 ---
 
@@ -91,11 +93,11 @@ Right-click `index.html` in VS Code and choose **Open with Live Server**.
 
 ## Publishing Guide — `https://web.itu.edu.tr/otag23/`
 
-ITU personal web pages are served from `~/public_html` under `https://web.itu.edu.tr/<username>/`.
+ITU personal web pages are served under `https://web.itu.edu.tr/<username>/` from `~/public_html/` (or `~/web.itu.edu.tr/` depending on your ITU BİDB account setup).
 
 ### Prerequisites
 
-1. **Network / ITU VPN:** If deploying from outside the ITU campus network (`eduroam` / campus LAN), connect to the **ITU VPN (FortiClient)** first so SSH/SCP ports are reachable.
+1. **Network / ITU VPN:** İTÜ BİDB blocks SSH/SFTP port `22` from external networks. If deploying from outside the ITU campus network (`eduroam` / campus LAN), connect to the **ITU VPN (FortiClient)** first.
 2. **OpenSSH Client (Windows):** Built into modern Windows 10/11 (`scp`). If missing, install via Administrator PowerShell:
    ```powershell
    Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
@@ -103,44 +105,49 @@ ITU personal web pages are served from `~/public_html` under `https://web.itu.ed
 
 ### Method A: Automated Deployment via `deploy-itu.ps1` (Recommended)
 
-`deploy-itu.ps1` copies **only** the static deployable files (`index.html`, `about.html`, `projects.html`, `journey.html`, `enis_journey.html`, and `assets/`) into a clean temporary staging folder—automatically excluding `.git`, `README.md`, and `deploy-itu.ps1`—and uploads them via `scp`.
+`deploy-itu.ps1` copies **only** the static deployable files (`index.html`, `about.html`, `projects.html`, `journey.html`, `enis_journey.html`, and `assets/`) into a clean temporary staging folder—automatically excluding `.git`, `README.md`, and `deploy-itu.ps1`—runs a 3-second TCP reachability check on port `22` (with automatic fallback from `ssh.itu.edu.tr` to `web.itu.edu.tr`), and uploads them via `scp`.
 
 1. **Preview what will be uploaded (Dry Run):**
    ```powershell
    .\deploy-itu.ps1 -DryRun
    ```
-2. **Deploy using default settings (`otag23@web.itu.edu.tr:public_html/`):**
+2. **Deploy using default settings (`otag23@ssh.itu.edu.tr:public_html/`):**
    ```powershell
    .\deploy-itu.ps1
    ```
-3. **Alternate ITU SSH host (if required by your ITU BİDB account):**
+3. **If ITU hosts your personal site under `~/web.itu.edu.tr/` instead of `~/public_html/`:**
    ```powershell
-   .\deploy-itu.ps1 -Username "otag23" -RemoteHost "ssh.itu.edu.tr" -RemotePath "public_html"
+   .\deploy-itu.ps1 -RemotePath web.itu.edu.tr
+   ```
+4. **Override host or username explicitly (e.g., direct `web.itu.edu.tr`):**
+   ```powershell
+   .\deploy-itu.ps1 -Username "otag23" -RemoteHost "web.itu.edu.tr" -RemotePath "public_html"
    ```
 
 ### Method B: Manual SFTP / WinSCP Fallback
 
 If you prefer a GUI client (such as WinSCP or FileZilla):
 
-1. Connect to **Host:** `web.itu.edu.tr` (or `ssh.itu.edu.tr` if configured by ITU BİDB), **Protocol:** `SFTP` (or `SCP`), **Port:** `22`, **Username:** `otag23`.
-2. Navigate to `~/public_html` on the remote server.
+1. Connect to **Host:** `ssh.itu.edu.tr` (default ITU SSH/SFTP gateway; or `web.itu.edu.tr` if configured by ITU BİDB), **Protocol:** `SFTP` (or `SCP`), **Port:** `22`, **Username:** `otag23`.
+2. Navigate to `~/public_html` (or `~/web.itu.edu.tr` if your account uses that directory) on the remote server.
 3. Upload **only** these items:
    - `index.html`
    - `about.html`
    - `projects.html`
    - `journey.html`
    - `enis_journey.html`
-   - `assets/` (including `css/`, `js/`, `cv/`)
+   - `assets/` (including `css/`, `js/`, `img/`, `cv/`)
 4. Do **not** upload `.git/`, `.gitignore`, `README.md`, or `deploy-itu.ps1`.
 
 ### Post-Deployment Verification
 
-1. Open [https://web.itu.edu.tr/otag23/](https://web.itu.edu.tr/otag23/) and verify all navigation tabs (`index.html`, `about.html`, `projects.html`, `journey.html`).
+1. Open [https://web.itu.edu.tr/otag23/](https://web.itu.edu.tr/otag23/) and verify all navigation tabs (`index.html` Home, `about.html`, `projects.html`, `journey.html`).
 2. Toggle `TR / EN` and `Light / Dark` modes to confirm styles and `localStorage` persistence.
-3. Verify both CV PDFs open cleanly (`assets/cv/enis_cv_tr.pdf` and `assets/cv/enis_cv_en.pdf`).
+3. Verify the portrait image (`assets/img/profile.jpg`) and both CV PDFs (`assets/cv/enis_cv_tr.pdf`, `assets/cv/enis_cv_en.pdf`) load cleanly.
 4. Test project category filters on `projects.html` and launch Level 1 on `journey.html`.
-5. If Apache returns `403 Forbidden`, verify directory and file permissions on the ITU host:
+5. If Apache returns `403 Forbidden`, verify home, directory, and file permissions on the ITU host (adjust `~/public_html` to `~/web.itu.edu.tr` if applicable):
    ```bash
+   chmod 701 ~
    chmod 755 ~/public_html
    find ~/public_html -type d -exec chmod 755 {} +
    find ~/public_html -type f -exec chmod 644 {} +
